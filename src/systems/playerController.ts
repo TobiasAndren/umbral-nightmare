@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import Enemy from "../enemies/Enemy";
 
 export function setupPlayerControls(
   player: Phaser.Physics.Arcade.Sprite,
@@ -26,6 +27,26 @@ export function setupPlayerControls(
   const attackBody = attackHitBox.body as Phaser.Physics.Arcade.Body;
   attackBody.enable = false;
   attackBody.allowGravity = false;
+
+  let hasHitEnemy = new Set<Enemy>();
+
+  if (enemies) {
+    scene.physics.add.overlap(
+      attackHitBox,
+      enemies,
+      (_hitbox, enemyGO) => {
+        if ("takeDamage" in enemyGO) {
+          const enemy = enemyGO as Enemy;
+          if (!hasHitEnemy.has(enemy)) {
+            enemy.takeDamage(1);
+            hasHitEnemy.add(enemy);
+          }
+        }
+      },
+      undefined,
+      scene
+    );
+  }
 
   let isAttacking = false;
   let attackQueued = false;
@@ -60,6 +81,7 @@ export function setupPlayerControls(
         attackBody.enable = false;
         isAttacking = false;
         player.off(Phaser.Animations.Events.ANIMATION_UPDATE, onFrameUpdate);
+        hasHitEnemy.clear();
 
         if (player.body?.velocity.x === 0 && player.body?.blocked.down)
           player.anims.play("idle", true);
