@@ -1,8 +1,11 @@
 import Phaser from "phaser";
-import { createPlayerAnimations } from "../player/playerAnimations";
-import { setupPlayerControls } from "../systems/playerController";
+import { setupPlayerControls } from "../player/playerController";
 import { createPlatforms } from "../environment/platform";
-import Enemy from "../enemies/Enemy";
+import { preloadPlayerSprites } from "../assets/playerAssets";
+import { createPlayerAnimations } from "../player/playerAnimations";
+import { preloadShadowEnemySprites } from "../assets/shadowEnemyAssets";
+import { createShadowEnemyAnimations } from "../enemies/shadowEnemyAnimations";
+import ShadowEnemy from "../enemies/ShadowEnemy";
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -10,67 +13,32 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    const spriteConfigs = [
-      {
-        key: "player_idle",
-        file: "Idle.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-      {
-        key: "player_run",
-        file: "Run.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-      {
-        key: "player_attack",
-        file: "Attack-1.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-      {
-        key: "player_jump",
-        file: "Jump.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-      {
-        key: "player_fall",
-        file: "Fall.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-      {
-        key: "player_hurt",
-        file: "Hurt.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-    ];
-
-    spriteConfigs.forEach((config) =>
-      this.load.spritesheet(
-        config.key,
-        `assets/player/${config.file}`,
-        config.frames
-      )
-    );
+    preloadPlayerSprites(this);
+    preloadShadowEnemySprites(this);
   }
 
   create() {
+    const platforms = createPlatforms(this);
+
+    createPlayerAnimations(this);
+    createShadowEnemyAnimations(this);
+
     const player = this.physics.add.sprite(100, 400, "player_idle");
+    player.body.setSize(15, 20);
 
     const enemies = this.physics.add.group({
-      classType: Enemy,
       runChildUpdate: true,
     });
 
-    const testEnemy = new Enemy(this, 400, 400, "player_idle");
-    testEnemy.setPlayer(player);
-    enemies.add(testEnemy);
+    const shadowEnemy = new ShadowEnemy(this, 400, 400);
+    shadowEnemy.setPlayer(player);
+    shadowEnemy.body?.setSize(20, 20);
+    shadowEnemy.body?.setOffset(20, 23);
+    enemies.add(shadowEnemy);
 
-    player.body.setSize(15, 15);
-    testEnemy.body?.setSize(15, 15);
-
-    createPlayerAnimations(this);
-    const platforms = createPlatforms(this);
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(enemies, platforms);
+    this.physics.add.collider(player, enemies);
 
     this.cameras.main.setZoom(2);
     this.cameras.main.startFollow(player, true, 0.05, 0.05);
