@@ -1,4 +1,7 @@
 import Phaser from "phaser";
+import { createPlayerAnimations } from "../player/playerAnimations";
+import { setupPlayerControls } from "../player/playerController";
+import { createPlatforms } from "../environment/platform";
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -6,107 +9,61 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.spritesheet("player_idle", "assets/player/Idle.png", {
-      frameWidth: 144,
-      frameHeight: 82,
-    });
+    const spriteConfigs = [
+      {
+        key: "player_idle",
+        file: "Idle.png",
+        frames: { frameWidth: 144, frameHeight: 144 },
+      },
+      {
+        key: "player_run",
+        file: "Run.png",
+        frames: { frameWidth: 144, frameHeight: 144 },
+      },
+      {
+        key: "player_attack",
+        file: "Attack-1.png",
+        frames: { frameWidth: 144, frameHeight: 144 },
+      },
+      {
+        key: "player_jump",
+        file: "Jump.png",
+        frames: { frameWidth: 144, frameHeight: 144 },
+      },
+      {
+        key: "player_fall",
+        file: "Fall.png",
+        frames: { frameWidth: 144, frameHeight: 144 },
+      },
+      {
+        key: "player_hurt",
+        file: "Hurt.png",
+        frames: { frameWidth: 144, frameHeight: 144 },
+      },
+    ];
 
-    this.load.spritesheet("player_run", "assets/player/Run.png", {
-      frameWidth: 144,
-      frameHeight: 82,
-    });
-
-    this.load.spritesheet("player_attack", "assets/player/Attack-1.png", {
-      frameWidth: 144,
-      frameHeight: 82,
-    });
-
-    this.load.spritesheet("player_jump", "assets/player/Jump.png", {
-      frameWidth: 144,
-      frameHeight: 82,
-    });
-
-    this.load.spritesheet("player_fall", "assets/player/Fall.png", {
-      frameWidth: 144,
-      frameHeight: 82,
-    });
-
-    this.load.spritesheet("player_hurt", "assets/player/Hurt.png", {
-      frameWidth: 144,
-      frameHeight: 82,
-    });
+    spriteConfigs.forEach((config) =>
+      this.load.spritesheet(
+        config.key,
+        `assets/player/${config.file}`,
+        config.frames
+      )
+    );
   }
 
   create() {
-    const player = this.physics.add.sprite(100, 200, "player_idle");
+    const player = this.physics.add.sprite(100, 400, "player_idle");
 
-    this.anims.create({
-      key: "idle",
-      frames: this.anims.generateFrameNumbers("player_idle", {
-        start: 0,
-        end: 6,
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
+    player.body.setSize(15, 15);
 
-    this.anims.create({
-      key: "run",
-      frames: this.anims.generateFrameNumbers("player_run", {
-        start: 0,
-        end: 7,
-      }),
-      frameRate: 15,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "attack",
-      frames: this.anims.generateFrameNumbers("player_attack", {
-        start: 0,
-        end: 9,
-      }),
-      frameRate: 20,
-      repeat: 0,
-    });
-
-    this.anims.create({
-      key: "jump",
-      frames: this.anims.generateFrameNumbers("player_jump", {
-        start: 0,
-        end: 3,
-      }),
-      frameRate: 10,
-      repeat: 0,
-    });
-
-    this.anims.create({
-      key: "fall",
-      frames: this.anims.generateFrameNumbers("player_fall", {
-        start: 0,
-        end: 3,
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "hurt",
-      frames: this.anims.generateFrameNumbers("player_hurt", {
-        start: 0,
-        end: 2,
-      }),
-      frameRate: 10,
-      repeat: 0,
-    });
-
-    const platforms = this.physics.add.staticGroup();
-
-    const ground = platforms.create(400, 550, undefined);
-    ground.setDisplaySize(800, 50);
-    ground.refreshBody();
-
+    createPlayerAnimations(this);
+    const platforms = createPlatforms(this);
     this.physics.add.collider(player, platforms);
+
+    this.cameras.main.setZoom(2);
+    this.cameras.main.startFollow(player, true, 0.05, 0.05);
+
+    setupPlayerControls(player, this);
 
     player.play("idle");
   }
