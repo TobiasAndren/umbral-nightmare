@@ -6,6 +6,8 @@ export default class ShadowEnemy extends Enemy {
   private attackHitbox?: Phaser.GameObjects.Rectangle;
   private attackBody?: Phaser.Physics.Arcade.Body;
   private overlapSet = false;
+  deathAnimKey = "shadow_death";
+  hurtAnimKey = "shadow_hurt";
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, "shadow_idle");
@@ -48,6 +50,8 @@ export default class ShadowEnemy extends Enemy {
   }
 
   update() {
+    if (this.isDead) return;
+    if (this.isHurt) return;
     if (!this.player) return;
 
     const distance = Phaser.Math.Distance.Between(

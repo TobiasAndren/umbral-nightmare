@@ -21,8 +21,8 @@ export function preloadShadowEnemySprites(scene: Phaser.Scene) {
       frameHeight: 64,
     },
     {
-      key: "shadow_jump",
-      file: "shadow-jump.png",
+      key: "shadow_hurt",
+      file: "shadow-hurt.png",
       frameWidth: 64,
       frameHeight: 64,
     },
