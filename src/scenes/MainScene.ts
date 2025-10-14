@@ -34,6 +34,7 @@ export default class MainScene extends Phaser.Scene {
     shadowEnemy.setPlayer(player);
     shadowEnemy.body?.setSize(20, 20);
     shadowEnemy.body?.setOffset(20, 23);
+
     enemies.add(shadowEnemy);
 
     this.physics.add.collider(player, platforms);

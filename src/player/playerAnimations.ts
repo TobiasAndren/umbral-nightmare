@@ -50,6 +50,14 @@ export function createPlayerAnimations(scene: Phaser.Scene) {
       frameRate: 10,
       repeat: 0,
     },
+    {
+      key: "death",
+      sheet: "player_death",
+      start: 0,
+      end: 8,
+      frameRate: 10,
+      repeat: 0,
+    },
   ];
 
   anims.forEach((a) =>

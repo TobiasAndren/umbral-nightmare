@@ -37,6 +37,11 @@ export const playerSpriteConfigs: SpriteConfig[] = [
     file: "Hurt.png",
     frames: { frameWidth: 144, frameHeight: 144 },
   },
+  {
+    key: "player_death",
+    file: "Death.png",
+    frames: { frameWidth: 144, frameHeight: 144 },
+  },
 ];
 
 export function preloadPlayerSprites(scene: Phaser.Scene) {
