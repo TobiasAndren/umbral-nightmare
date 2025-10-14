@@ -15,6 +15,7 @@ export function setupPlayerControls(
     SPACE: Phaser.Input.Keyboard.KeyCodes.SPACE,
   }) as { [key: string]: Phaser.Input.Keyboard.Key };
 
+  let isHurt = false;
   const attackHitBox = scene.add.rectangle(
     player.x,
     player.y,
@@ -91,8 +92,66 @@ export function setupPlayerControls(
     );
   }
 
+  player.setData("health", 5);
+  player.setData("isInvincible", false);
+
+  player.on("takeDamage", (amount: number, sourceX: number) => {
+    if (player.getData("isInvincible") || isHurt) return;
+
+    const newHealth = player.getData("health") - amount;
+    player.setData("health", newHealth);
+    console.log("Player Health:", newHealth);
+
+    isHurt = true;
+    isAttacking = false;
+
+    const direction = sourceX ? Math.sign(player.x - sourceX) : 1;
+
+    const knockbackX = 250 * direction;
+    const knockbackY = -200;
+
+    player.setVelocity(knockbackX, knockbackY);
+    player.anims.play("hurt", true);
+
+    player.setData("isInvincible", true);
+    scene.time.delayedCall(1000, () => {
+      player.setData("isInvincible", false);
+    });
+
+    if (newHealth <= 0) {
+      player.anims.play("death");
+      player.setVelocity(0);
+      player.body!.enable = false;
+
+      player.once(
+        Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "death",
+        () => {
+          scene.time.delayedCall(1000, () => {
+            scene.scene.restart();
+          });
+        }
+      );
+    } else {
+      player.once(
+        Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "hurt",
+        () => {
+          isHurt = false;
+          player.anims.play("idle", true);
+        }
+      );
+    }
+  });
+
+  player.on(Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "hurt", () => {
+    if (player.getData("health") > 0) player.anims.play("idle", true);
+  });
+
   scene.events.on("update", () => {
     if (!player.body) return;
+
+    if (isHurt) {
+      return;
+    }
 
     if (Phaser.Input.Keyboard.JustDown(cursors?.space || keys.SPACE)) {
       if (isAttacking) attackQueued = true;
