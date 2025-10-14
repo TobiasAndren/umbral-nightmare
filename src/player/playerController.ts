@@ -39,7 +39,7 @@ export function setupPlayerControls(
         if ("takeDamage" in enemyGO) {
           const enemy = enemyGO as Enemy;
           if (!hasHitEnemy.has(enemy)) {
-            enemy.takeDamage(1);
+            enemy.takeDamage(1, player.x);
             hasHitEnemy.add(enemy);
           }
         }
@@ -174,7 +174,7 @@ export function setupPlayerControls(
     }
 
     if ((cursors?.up?.isDown || keys.W.isDown) && player.body.blocked.down) {
-      player.setVelocityY(-400);
+      player.setVelocityY(-250);
       if (!isAttacking) player.anims.play("jump", true);
     }
 
