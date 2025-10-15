@@ -34,7 +34,7 @@ export function createForestBackground(scene: Phaser.Scene) {
     .get("close_trees")
     .getSourceImage().height;
 
-  const offsetY = 30;
+  const offsetY = 20;
 
   const bgY = (height - bgImageHeight) / 2 - offsetY;
   const farY = (height - farImageHeight) / 2 - offsetY;
