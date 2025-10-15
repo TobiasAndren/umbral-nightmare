@@ -1,23 +1,48 @@
 import Phaser from "phaser";
 import { setupPlayerControls } from "../player/playerController";
 import { createPlatforms } from "../environment/platform";
-import { preloadPlayerSprites } from "../assets/playerAssets";
+import { preloadPlayerSprites } from "../helpers/spriteLoaders/preloadPlayerAssets";
 import { createPlayerAnimations } from "../player/playerAnimations";
-import { preloadShadowEnemySprites } from "../assets/shadowEnemyAssets";
+import { preloadShadowEnemySprites } from "../helpers/spriteLoaders/preloadShadowEnemyAssets";
 import { createShadowEnemyAnimations } from "../enemies/shadowEnemyAnimations";
 import ShadowEnemy from "../enemies/ShadowEnemy";
+import {
+  createForestBackground,
+  preloadForestBackground,
+} from "../helpers/backgroundLoaders/preloadForestBackground";
 
 export default class MainScene extends Phaser.Scene {
+  private backgroundLayers?: {
+    bg: Phaser.GameObjects.TileSprite;
+    far: Phaser.GameObjects.TileSprite;
+    mid: Phaser.GameObjects.TileSprite;
+    close: Phaser.GameObjects.TileSprite;
+  };
+
   constructor() {
     super("MainScene");
   }
 
   preload() {
+    preloadForestBackground(this);
     preloadPlayerSprites(this);
     preloadShadowEnemySprites(this);
   }
 
+  update() {
+    const backgroundLayers = this.backgroundLayers;
+    const cam = this.cameras.main;
+
+    if (backgroundLayers) {
+      backgroundLayers.far.tilePositionX = cam.scrollX * 0.2;
+      backgroundLayers.mid.tilePositionX = cam.scrollX * 0.4;
+      backgroundLayers.close.tilePositionX = cam.scrollX * 0.7;
+    }
+  }
+
   create() {
+    this.backgroundLayers = createForestBackground(this);
+
     const platforms = createPlatforms(this);
 
     createPlayerAnimations(this);
@@ -41,8 +66,8 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(enemies, platforms);
     this.physics.add.collider(player, enemies);
 
-    this.cameras.main.setZoom(2);
-    this.cameras.main.startFollow(player, true, 0.05, 0.05);
+    this.cameras.main.setZoom(2.5);
+    this.cameras.main.startFollow(player, true, 0.2, 0.2, -50, 30);
 
     setupPlayerControls(player, this, enemies);
 

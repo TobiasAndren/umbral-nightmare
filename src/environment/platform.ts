@@ -5,7 +5,7 @@ export function createPlatforms(scene: Phaser.Scene) {
 
   // Mark
   const ground = platforms.create(400, 550, undefined);
-  ground.setDisplaySize(800, 50);
+  ground.setDisplaySize(3000, 50);
   ground.refreshBody();
 
   return platforms;
