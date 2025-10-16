@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { setupPlayerControls } from "../player/playerController";
-import { createGround } from "../environment/createGround";
+import { createGroundSegments } from "../environment/createGround";
 import { preloadPlayerSprites } from "../helpers/spriteLoaders/preloadPlayerAssets";
 import { createPlayerAnimations } from "../player/playerAnimations";
 import { preloadShadowEnemySprites } from "../helpers/spriteLoaders/preloadShadowEnemyAssets";
@@ -20,6 +20,13 @@ export default class MainScene extends Phaser.Scene {
     mid: Phaser.GameObjects.TileSprite;
     close: Phaser.GameObjects.TileSprite;
   };
+
+  private deathZoneY: number = 700;
+
+  private player!: Phaser.Physics.Arcade.Sprite;
+  private enemies!: Phaser.Physics.Arcade.Group;
+  private ground!: Phaser.Physics.Arcade.StaticGroup;
+  private platforms!: Phaser.Physics.Arcade.StaticGroup;
 
   constructor() {
     super("MainScene");
@@ -46,47 +53,55 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.backgroundLayers = createForestBackground(this);
 
-    const { ground, leftEdge, rightEdge } = createGround(this);
+    this.ground = createGroundSegments(this, [
+      { x: 0, width: 800 },
+      { x: 1000, width: 600 },
+      { x: 1900, width: 700 },
+    ]);
 
-    const platforms = createPlatforms(this, [
-      { x: 900, y: 355 },
-      { x: 700, y: 375 },
+    this.platforms = createPlatforms(this, [
+      { x: 900, y: 375 },
+      { x: 1700, y: 365 },
+      { x: 1800, y: 390 },
     ]);
 
     createPlayerAnimations(this);
     createShadowEnemyAnimations(this);
 
-    const player = this.physics.add.sprite(100, 400, "player_idle");
-    player.body.setSize(15, 17);
+    this.player = this.physics.add.sprite(100, 400, "player_idle");
+    this.player.body?.setSize(15, 17);
 
-    const enemies = this.physics.add.group({
+    this.enemies = this.physics.add.group({
       runChildUpdate: true,
     });
 
-    const shadowEnemy = new ShadowEnemy(this, 800, 400);
-    shadowEnemy.setPlayer(player);
-    shadowEnemy.body?.setSize(20, 20);
-    shadowEnemy.body?.setOffset(20, 20);
+    const enemyPositions = [
+      { x: 600, y: 400 },
+      { x: 700, y: 400 },
+      { x: 1200, y: 400 },
+      { x: 1500, y: 380 },
+      { x: 2100, y: 400 },
+    ];
 
-    const secondShadowEnemy = new ShadowEnemy(this, 775, 400);
-    secondShadowEnemy.setPlayer(player);
-    secondShadowEnemy.body?.setSize(20, 20);
-    secondShadowEnemy.body?.setOffset(20, 20);
+    enemyPositions.forEach((pos) => {
+      const enemy = new ShadowEnemy(this, pos.x, pos.y);
+      enemy.setPlayer(this.player);
+      enemy.body?.setSize(20, 20);
+      enemy.body?.setOffset(20, 20);
+      this.enemies.add(enemy);
+    });
 
-    enemies.add(shadowEnemy);
-    enemies.add(secondShadowEnemy);
-
-    this.physics.add.collider(player, ground!);
-    this.physics.add.collider(player, platforms);
-    this.physics.add.collider(enemies, ground!);
-    this.physics.add.collider(enemies, platforms);
-    this.physics.add.collider(player, enemies);
+    this.physics.add.collider(this.player, this.ground!);
+    this.physics.add.collider(this.player, this.platforms);
+    this.physics.add.collider(this.enemies, this.ground!);
+    this.physics.add.collider(this.enemies, this.platforms);
+    this.physics.add.collider(this.player, this.enemies);
 
     this.cameras.main.setZoom(2.5);
-    this.cameras.main.startFollow(player, true, 0.2, 0, -50, 30);
+    this.cameras.main.startFollow(this.player, true, 0.2, 0, -50, 30);
 
-    setupPlayerControls(player, this, enemies);
+    setupPlayerControls(this.player, this, this.enemies);
 
-    player.play("idle");
+    this.player.play("idle");
   }
 }

@@ -127,7 +127,7 @@ export function setupPlayerControls(
         Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "death",
         () => {
           scene.time.delayedCall(1000, () => {
-            scene.scene.restart();
+            handlePlayerDeath();
           });
         }
       );
@@ -141,6 +141,10 @@ export function setupPlayerControls(
       );
     }
   });
+
+  function handlePlayerDeath() {
+    scene.scene.restart();
+  }
 
   player.on(Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "hurt", () => {
     if (player.getData("health") > 0) player.anims.play("idle", true);
