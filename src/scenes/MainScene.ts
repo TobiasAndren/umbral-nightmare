@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { setupPlayerControls } from "../player/playerController";
-import { createGround } from "../environment/ground";
+import { createGround } from "../environment/createGround";
 import { preloadPlayerSprites } from "../helpers/spriteLoaders/preloadPlayerAssets";
 import { createPlayerAnimations } from "../player/playerAnimations";
 import { preloadShadowEnemySprites } from "../helpers/spriteLoaders/preloadShadowEnemyAssets";
@@ -11,6 +11,7 @@ import {
   preloadForestBackground,
 } from "../helpers/backgroundLoaders/preloadForestBackground";
 import { preloadForestTiles } from "../helpers/environmentLoaders/preloadForestTiles";
+import { createPlatforms } from "../environment/createPlatforms";
 
 export default class MainScene extends Phaser.Scene {
   private backgroundLayers?: {
@@ -45,7 +46,12 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.backgroundLayers = createForestBackground(this);
 
-    const ground = createGround(this);
+    const { ground, leftEdge, rightEdge } = createGround(this);
+
+    const platforms = createPlatforms(this, [
+      { x: 900, y: 355 },
+      { x: 700, y: 375 },
+    ]);
 
     createPlayerAnimations(this);
     createShadowEnemyAnimations(this);
@@ -57,15 +63,23 @@ export default class MainScene extends Phaser.Scene {
       runChildUpdate: true,
     });
 
-    const shadowEnemy = new ShadowEnemy(this, 400, 400);
+    const shadowEnemy = new ShadowEnemy(this, 800, 400);
     shadowEnemy.setPlayer(player);
     shadowEnemy.body?.setSize(20, 20);
     shadowEnemy.body?.setOffset(20, 20);
 
+    const secondShadowEnemy = new ShadowEnemy(this, 775, 400);
+    secondShadowEnemy.setPlayer(player);
+    secondShadowEnemy.body?.setSize(20, 20);
+    secondShadowEnemy.body?.setOffset(20, 20);
+
     enemies.add(shadowEnemy);
+    enemies.add(secondShadowEnemy);
 
     this.physics.add.collider(player, ground!);
+    this.physics.add.collider(player, platforms);
     this.physics.add.collider(enemies, ground!);
+    this.physics.add.collider(enemies, platforms);
     this.physics.add.collider(player, enemies);
 
     this.cameras.main.setZoom(2.5);

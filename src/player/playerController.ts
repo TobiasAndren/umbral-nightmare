@@ -160,12 +160,12 @@ export function setupPlayerControls(
 
     let moving = false;
     if (cursors?.left?.isDown || keys.A.isDown) {
-      player.setVelocityX(-200);
+      player.setVelocityX(-150);
       if (!isAttacking) player.anims.play("run", true);
       player.setFlipX(true);
       moving = true;
     } else if (cursors?.right?.isDown || keys.D.isDown) {
-      player.setVelocityX(200);
+      player.setVelocityX(150);
       if (!isAttacking) player.anims.play("run", true);
       player.setFlipX(false);
       moving = true;
@@ -174,7 +174,7 @@ export function setupPlayerControls(
     }
 
     if ((cursors?.up?.isDown || keys.W.isDown) && player.body.blocked.down) {
-      player.setVelocityY(-250);
+      player.setVelocityY(-300);
       if (!isAttacking) player.anims.play("jump", true);
     }
 
