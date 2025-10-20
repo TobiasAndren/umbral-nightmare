@@ -100,7 +100,7 @@ export function setupPlayerControls(
 
     const newHealth = player.getData("health") - amount;
     player.setData("health", newHealth);
-    console.log("Player Health:", newHealth);
+    player.emit("healthChanged", newHealth);
 
     isHurt = true;
     isAttacking = false;
