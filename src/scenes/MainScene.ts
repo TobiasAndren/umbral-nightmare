@@ -86,8 +86,8 @@ export default class MainScene extends Phaser.Scene {
     enemyPositions.forEach((pos) => {
       const enemy = new ShadowEnemy(this, pos.x, pos.y);
       enemy.setPlayer(this.player);
-      enemy.body?.setSize(20, 20);
-      enemy.body?.setOffset(20, 20);
+      enemy.body?.setSize(15, 20);
+      enemy.body?.setOffset(25, 20);
       this.enemies.add(enemy);
     });
 

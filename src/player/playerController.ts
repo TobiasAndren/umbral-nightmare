@@ -19,7 +19,7 @@ export function setupPlayerControls(
   const attackHitBox = scene.add.rectangle(
     player.x,
     player.y,
-    45,
+    35,
     25,
     0xff0000,
     0

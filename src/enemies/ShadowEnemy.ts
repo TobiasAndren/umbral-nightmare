@@ -61,7 +61,7 @@ export default class ShadowEnemy extends Enemy {
       this.player.y
     );
 
-    if (distance < 35) {
+    if (distance < 25) {
       this.setVelocityX(0);
 
       if (!this.isAttacking) {
