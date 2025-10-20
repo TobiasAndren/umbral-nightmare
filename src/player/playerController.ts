@@ -19,7 +19,7 @@ export function setupPlayerControls(
   const attackHitBox = scene.add.rectangle(
     player.x,
     player.y,
-    45,
+    35,
     25,
     0xff0000,
     0
@@ -127,7 +127,7 @@ export function setupPlayerControls(
         Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "death",
         () => {
           scene.time.delayedCall(1000, () => {
-            scene.scene.restart();
+            handlePlayerDeath();
           });
         }
       );
@@ -141,6 +141,10 @@ export function setupPlayerControls(
       );
     }
   });
+
+  function handlePlayerDeath() {
+    scene.scene.restart();
+  }
 
   player.on(Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "hurt", () => {
     if (player.getData("health") > 0) player.anims.play("idle", true);
@@ -160,12 +164,12 @@ export function setupPlayerControls(
 
     let moving = false;
     if (cursors?.left?.isDown || keys.A.isDown) {
-      player.setVelocityX(-200);
+      player.setVelocityX(-150);
       if (!isAttacking) player.anims.play("run", true);
       player.setFlipX(true);
       moving = true;
     } else if (cursors?.right?.isDown || keys.D.isDown) {
-      player.setVelocityX(200);
+      player.setVelocityX(150);
       if (!isAttacking) player.anims.play("run", true);
       player.setFlipX(false);
       moving = true;
@@ -174,7 +178,7 @@ export function setupPlayerControls(
     }
 
     if ((cursors?.up?.isDown || keys.W.isDown) && player.body.blocked.down) {
-      player.setVelocityY(-250);
+      player.setVelocityY(-300);
       if (!isAttacking) player.anims.play("jump", true);
     }
 
