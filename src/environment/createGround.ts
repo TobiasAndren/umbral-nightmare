@@ -20,7 +20,6 @@ export function createGroundSegments(
       .tileSprite(x, y, width, groundHeight, "ground_tile")
       .setOrigin(0, 0.5);
 
-    // Vänster och höger kant
     const leftEdge = scene.add
       .image(x, y, "ground_edge_left")
       .setOrigin(0, 0.5);
@@ -28,12 +27,10 @@ export function createGroundSegments(
       .image(x + width, y, "ground_edge_right")
       .setOrigin(1, 0.5);
 
-    // Lägg till fysik för marken
     scene.physics.add.existing(ground, true);
     const body = ground.body as Phaser.Physics.Arcade.StaticBody;
     body.updateFromGameObject();
 
-    // Lägg till i gruppen
     group.add(ground);
   });
 
