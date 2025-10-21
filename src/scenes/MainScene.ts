@@ -13,6 +13,7 @@ import {
 import { preloadForestTiles } from "../helpers/environmentLoaders/preloadForestTiles";
 import { createPlatforms } from "../environment/createPlatforms";
 import { preloadPlayerHealth } from "../helpers/uiLoaders/preloadPlayerHealth";
+import { setupPlayerHealth } from "../player/playerHealth";
 
 export default class MainScene extends Phaser.Scene {
   private backgroundLayers?: {
@@ -26,9 +27,7 @@ export default class MainScene extends Phaser.Scene {
   private enemies!: Phaser.Physics.Arcade.Group;
   private ground!: Phaser.Physics.Arcade.StaticGroup;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
-
-  private hearts: Phaser.GameObjects.Image[] = [];
-  private maxHealth: number = 5;
+  private targetCamY: number = 0;
 
   constructor() {
     super("MainScene");
@@ -45,37 +44,29 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.backgroundLayers = createForestBackground(this);
 
-    for (let i = 0; i < this.maxHealth; i++) {
-      const heart = this.add
-        .image(440 + i * 24, 210, "full_heart")
-        .setOrigin(0, 0)
-        .setScrollFactor(0)
-        .setScale(0.02);
-
-      this.hearts.push(heart);
-    }
-
     this.ground = createGroundSegments(this, [
       { x: 0, width: 800 },
       { x: 1000, width: 600 },
       { x: 1900, width: 700 },
+      { x: 3400, width: 1000, y: 300 },
     ]);
 
     this.platforms = createPlatforms(this, [
       { x: 900, y: 375 },
       { x: 1700, y: 365 },
       { x: 1800, y: 390 },
+      { x: 2700, y: 375 },
+      { x: 2850, y: 345 },
+      { x: 3000, y: 315 },
+      { x: 3150, y: 285 },
+      { x: 3300, y: 255 },
     ]);
 
     createPlayerAnimations(this);
     createShadowEnemyAnimations(this);
 
-    this.player = this.physics.add.sprite(100, 400, "player_idle");
+    this.player = this.physics.add.sprite(250, 400, "player_idle");
     this.player.body?.setSize(15, 17);
-
-    this.player.on("healthChanged", (currentHealth: number) => {
-      this.updateHearts(currentHealth);
-    });
 
     this.enemies = this.physics.add.group({
       runChildUpdate: true,
@@ -86,7 +77,9 @@ export default class MainScene extends Phaser.Scene {
       { x: 700, y: 400 },
       { x: 1200, y: 400 },
       { x: 1500, y: 380 },
-      { x: 2100, y: 400 },
+      { x: 2000, y: 400 },
+      { x: 3700, y: 200 },
+      { x: 4000, y: 200 },
     ];
 
     enemyPositions.forEach((pos) => {
@@ -106,33 +99,10 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.setZoom(2.5);
     this.cameras.main.startFollow(this.player, true, 0.2, 0, -50, 30);
 
+    setupPlayerHealth(this.player, this, 5);
     setupPlayerControls(this.player, this, this.enemies);
 
     this.player.play("idle");
-  }
-
-  private updateHearts(currentHealth: number) {
-    for (let i = 0; i < this.hearts.length; i++) {
-      if (i < currentHealth) {
-        this.hearts[i].setTexture("full_heart");
-      } else {
-        if (this.hearts[i].texture.key !== "empty_heart") {
-          this.hearts[i].setTexture("empty_heart");
-
-          this.tweens.add({
-            targets: this.hearts[i],
-            angle: { from: -5, to: 5 },
-            yoyo: true,
-            repeat: 2,
-            duration: 100,
-            ease: "Sine.easeInOut",
-            onComplete: () => {
-              this.hearts[i].setAngle(0);
-            },
-          });
-        }
-      }
-    }
   }
 
   update() {
@@ -143,6 +113,16 @@ export default class MainScene extends Phaser.Scene {
       backgroundLayers.far.tilePositionX = cam.scrollX * 0.2;
       backgroundLayers.mid.tilePositionX = cam.scrollX * 0.4;
       backgroundLayers.close.tilePositionX = cam.scrollX * 0.7;
+    }
+
+    if (this.player.x >= 2300 && this.player.x <= 3600) {
+      this.targetCamY = this.player.y - 375;
+    } else {
+      this.targetCamY = cam.scrollY;
+    }
+
+    if (this.targetCamY !== undefined) {
+      cam.scrollY = Phaser.Math.Linear(cam.scrollY, this.targetCamY, 0.05);
     }
   }
 }
