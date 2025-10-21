@@ -6,7 +6,7 @@ interface GroundSegment {
   y?: number;
 }
 
-export function createGroundSegments(
+export function createForestGroundSegments(
   scene: Phaser.Scene,
   segments: GroundSegment[]
 ) {
@@ -15,16 +15,15 @@ export function createGroundSegments(
   segments.forEach(({ x, width, y = 500 }) => {
     const groundHeight = 150;
 
-    // TileSprite för marken
     const ground = scene.add
-      .tileSprite(x, y, width, groundHeight, "ground_tile")
+      .tileSprite(x, y, width, groundHeight, "forest_ground_tile")
       .setOrigin(0, 0.5);
 
     const leftEdge = scene.add
-      .image(x, y, "ground_edge_left")
+      .image(x, y, "forest_ground_edge_left")
       .setOrigin(0, 0.5);
     const rightEdge = scene.add
-      .image(x + width, y, "ground_edge_right")
+      .image(x + width, y, "forest_ground_edge_right")
       .setOrigin(1, 0.5);
 
     scene.physics.add.existing(ground, true);
