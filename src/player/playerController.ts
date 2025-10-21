@@ -13,13 +13,27 @@ export function setupPlayerControls(
 
   scene.events.on("update", () => {
     if (!player.body) return;
-    if (player.getData("isKnockedBack")) return;
+
+    const isKnockedBack = player.getData("isKnockedBack");
 
     if (Phaser.Input.Keyboard.JustDown(cursors.space || keys.SPACE)) {
       attack.queueAttack();
     }
 
-    handleMovement(player, cursors, keys, attack.state.isAttacking);
+    handleMovement(
+      player,
+      cursors,
+      keys,
+      attack.state.isAttacking,
+      isKnockedBack
+    );
+
+    if (attack.state.isAttacking) {
+      // Om man vill kan man låta attack-animation “override” movement animation
+      if (!player.anims.isPlaying || player.anims.getName() !== "attack") {
+        player.anims.play("attack", true);
+      }
+    }
 
     if (!attack.state.isAttacking) {
       attack.attackHitBox.x = player.flipX ? player.x - 20 : player.x + 20;

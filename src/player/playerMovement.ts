@@ -4,8 +4,13 @@ export function handleMovement(
   player: Phaser.Physics.Arcade.Sprite,
   cursors: any,
   keys: any,
-  isAttacking: boolean
+  isAttacking: boolean,
+  isKnockedBack: boolean
 ) {
+  if (isKnockedBack) {
+    return false;
+  }
+
   let moving = false;
 
   if (cursors.left.isDown || keys.A.isDown) {

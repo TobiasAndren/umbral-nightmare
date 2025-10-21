@@ -59,19 +59,24 @@ export function setupPlayerAttack(
 
     player.on(Phaser.Animations.Events.ANIMATION_UPDATE, onFrameUpdate);
 
+    const onComplete = () => {
+      attackBody.enable = false;
+      state.isAttacking = false;
+      player.off(Phaser.Animations.Events.ANIMATION_UPDATE, onFrameUpdate);
+      hasHitEnemy.clear();
+
+      if (player.body?.velocity.x === 0 && player.body?.blocked.down) {
+        player.anims.play("idle", true);
+      }
+
+      if (state.attackQueued) {
+        startAttack();
+      }
+    };
+
     player.once(
       Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "attack",
-      () => {
-        attackBody.enable = false;
-        state.isAttacking = false;
-        player.off(Phaser.Animations.Events.ANIMATION_UPDATE, onFrameUpdate);
-        hasHitEnemy.clear();
-
-        if (player.body?.velocity.x === 0 && player.body?.blocked.down)
-          player.anims.play("idle", true);
-
-        if (state.attackQueued) startAttack();
-      }
+      onComplete
     );
   }
 
