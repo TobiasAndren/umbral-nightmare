@@ -98,7 +98,8 @@ export function setupPlayerHealth(
   }
 
   scene.events.on("update", () => {
-    if (player.y > 600 && player.active) {
+    if (player.y > 600 && player.active && !player.getData("isDead")) {
+      player.setData("isDead", true);
       player.emit("takeDamage", maxHealth);
     }
   });

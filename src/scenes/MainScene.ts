@@ -27,6 +27,7 @@ export default class MainScene extends Phaser.Scene {
   private enemies!: Phaser.Physics.Arcade.Group;
   private ground!: Phaser.Physics.Arcade.StaticGroup;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
+  private targetCamY: number = 0;
 
   constructor() {
     super("MainScene");
@@ -47,18 +48,24 @@ export default class MainScene extends Phaser.Scene {
       { x: 0, width: 800 },
       { x: 1000, width: 600 },
       { x: 1900, width: 700 },
+      { x: 3400, width: 1000, y: 300 },
     ]);
 
     this.platforms = createPlatforms(this, [
       { x: 900, y: 375 },
       { x: 1700, y: 365 },
       { x: 1800, y: 390 },
+      { x: 2700, y: 375 },
+      { x: 2850, y: 345 },
+      { x: 3000, y: 315 },
+      { x: 3150, y: 285 },
+      { x: 3300, y: 255 },
     ]);
 
     createPlayerAnimations(this);
     createShadowEnemyAnimations(this);
 
-    this.player = this.physics.add.sprite(100, 400, "player_idle");
+    this.player = this.physics.add.sprite(250, 400, "player_idle");
     this.player.body?.setSize(15, 17);
 
     this.enemies = this.physics.add.group({
@@ -70,7 +77,9 @@ export default class MainScene extends Phaser.Scene {
       { x: 700, y: 400 },
       { x: 1200, y: 400 },
       { x: 1500, y: 380 },
-      { x: 2100, y: 400 },
+      { x: 2000, y: 400 },
+      { x: 3700, y: 200 },
+      { x: 4000, y: 200 },
     ];
 
     enemyPositions.forEach((pos) => {
@@ -104,6 +113,16 @@ export default class MainScene extends Phaser.Scene {
       backgroundLayers.far.tilePositionX = cam.scrollX * 0.2;
       backgroundLayers.mid.tilePositionX = cam.scrollX * 0.4;
       backgroundLayers.close.tilePositionX = cam.scrollX * 0.7;
+    }
+
+    if (this.player.x >= 2300 && this.player.x <= 3600) {
+      this.targetCamY = this.player.y - 375;
+    } else {
+      this.targetCamY = cam.scrollY;
+    }
+
+    if (this.targetCamY !== undefined) {
+      cam.scrollY = Phaser.Math.Linear(cam.scrollY, this.targetCamY, 0.05);
     }
   }
 }
