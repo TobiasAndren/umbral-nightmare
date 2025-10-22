@@ -10,6 +10,8 @@ export default class UndeadExecutioner extends Boss {
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, "boss_idle");
 
+    (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+
     this.projectileGroup = this.scene.physics.add.group({
       allowGravity: false,
     });
@@ -18,6 +20,13 @@ export default class UndeadExecutioner extends Boss {
   update() {
     super.update();
     if (this.isDead) return;
+
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    if (body.velocity.x < 0) {
+      this.setFlipX(true);
+    } else if (body.velocity.x > 0) {
+      this.setFlipX(false);
+    }
 
     switch (this.state) {
       case "idle":
@@ -30,6 +39,14 @@ export default class UndeadExecutioner extends Boss {
 
   private idleLogic() {
     if (this.attackCooldown || this.state === "attacking") return;
+
+    const randomX = Phaser.Math.Between(300, 700);
+    const randomY = Phaser.Math.Between(200, 400);
+    this.scene.physics.moveTo(this, randomX, randomY, 80);
+
+    this.scene.time.delayedCall(1000, () => {
+      this.setVelocity(0, 0);
+    });
 
     this.attackCooldown = true;
     this.state = "attacking";
@@ -49,7 +66,6 @@ export default class UndeadExecutioner extends Boss {
     }
   }
 
-  /** 🔄 Gemensam funktion för att avsluta attacker */
   private endAttack(delay: number = 4000) {
     const timer = this.scene.time.delayedCall(delay, () => {
       this.clearAttackTimers();
@@ -61,39 +77,52 @@ export default class UndeadExecutioner extends Boss {
     this.currentAttackTimers.push(timer);
   }
 
-  /** 🧹 Rensa tidigare timers */
   private clearAttackTimers() {
     this.currentAttackTimers.forEach((t) => t.remove());
     this.currentAttackTimers = [];
   }
 
-  // ---------------- ATTACKER ----------------
-
   private performMeleeAttack() {
     if (!this.player) return;
 
     this.clearAttackTimers();
+    this.state = "attacking";
 
     const playerX = this.player.x;
     const direction = playerX < this.x ? -1 : 1;
-    this.setVelocityX(200 * direction);
 
-    const timer1 = this.scene.time.delayedCall(800, () => {
-      this.setVelocityX(0);
-      this.play("boss_attack", true);
+    const attackRange = 100;
+    const speed = 200;
 
-      const hit1 = this.scene.time.delayedCall(600, () =>
-        this.triggerMeleeHit()
+    const checkDistance = () => {
+      if (!this.player) return;
+      const distance = Phaser.Math.Distance.Between(
+        this.x,
+        this.y,
+        this.player.x,
+        this.player.y
       );
-      const hit2 = this.scene.time.delayedCall(900, () =>
-        this.triggerMeleeHit()
-      );
 
-      this.currentAttackTimers.push(hit1, hit2);
-    });
+      if (distance > attackRange) {
+        this.scene.physics.moveToObject(this, this.player, speed);
+        this.scene.time.delayedCall(50, checkDistance);
+      } else {
+        this.setVelocity(0, 0);
+        this.play("boss_attack", true);
 
-    this.currentAttackTimers.push(timer1);
-    this.endAttack(2200); // bossen återgår till idle efter ~2 sekunder
+        const hit1 = this.scene.time.delayedCall(600, () =>
+          this.triggerMeleeHit()
+        );
+        const hit2 = this.scene.time.delayedCall(900, () =>
+          this.triggerMeleeHit()
+        );
+        this.currentAttackTimers.push(hit1, hit2);
+
+        this.endAttack(2200);
+      }
+    };
+
+    checkDistance();
   }
 
   private triggerMeleeHit() {
