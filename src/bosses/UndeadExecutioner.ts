@@ -88,10 +88,7 @@ export default class UndeadExecutioner extends Boss {
     this.clearAttackTimers();
     this.state = "attacking";
 
-    const playerX = this.player.x;
-    const direction = playerX < this.x ? -1 : 1;
-
-    const attackRange = 100;
+    const attackRange = 90;
     const speed = 200;
 
     const checkDistance = () => {
@@ -131,26 +128,39 @@ export default class UndeadExecutioner extends Boss {
 
   private performSkillMove() {
     this.clearAttackTimers();
+    this.state = "attacking";
 
-    const midX = 500;
-    const move = this.scene.time.delayedCall(0, () => {
-      this.scene.physics.moveTo(this, midX, this.y, 200);
-    });
+    const targetX = 550;
+    const targetY = 275;
+    const speed = 250;
 
-    const stop = this.scene.time.delayedCall(1000, () => {
-      this.setVelocity(0, 0);
-      this.play("boss_skill", true);
+    this.scene.physics.moveTo(this, targetX, targetY, speed);
 
-      for (let i = 0; i < 8; i++) {
-        const ringTimer = this.scene.time.delayedCall(i * 300, () =>
-          this.spawnProjectileRing()
-        );
-        this.currentAttackTimers.push(ringTimer);
+    const checkArrival = () => {
+      const distance = Phaser.Math.Distance.Between(
+        this.x,
+        this.y,
+        targetX,
+        targetY
+      );
+      if (distance > 10) {
+        this.scene.time.delayedCall(50, checkArrival);
+      } else {
+        this.setVelocity(0, 0);
+        this.play("boss_skill", true);
+
+        for (let i = 0; i < 8; i++) {
+          const ringTimer = this.scene.time.delayedCall(i * 300, () =>
+            this.spawnProjectileRing()
+          );
+          this.currentAttackTimers.push(ringTimer);
+        }
+
+        this.endAttack(4000);
       }
-    });
+    };
 
-    this.currentAttackTimers.push(move, stop);
-    this.endAttack(4000);
+    checkArrival();
   }
 
   private spawnProjectileRing() {
@@ -173,23 +183,55 @@ export default class UndeadExecutioner extends Boss {
 
   private performSummon() {
     this.clearAttackTimers();
-    this.setVelocity(0, 0);
-    this.play("boss_summon", true);
+    this.state = "attacking";
 
-    const summonInterval = this.scene.time.addEvent({
-      delay: 2000,
-      callback: () => this.spawnDemon(),
-      loop: true,
-    });
+    const possiblePositions = [
+      { x: 300, y: 225 },
+      { x: 800, y: 225 },
+      { x: 550, y: 275 },
+    ];
+    const target = Phaser.Math.RND.pick(possiblePositions);
 
-    const endTimer = this.scene.time.delayedCall(6000, () => {
-      summonInterval.remove();
-      this.state = "idle";
-      this.attackCooldown = false;
-      this.play("boss_idle", true);
-    });
+    const speed = 250;
+    this.scene.physics.moveTo(this, target.x, target.y, speed);
 
-    this.currentAttackTimers.push(endTimer);
+    let elapsed = 0;
+    const tolerance = 20;
+
+    const checkArrival = () => {
+      const distance = Phaser.Math.Distance.Between(
+        this.x,
+        this.y,
+        target.x,
+        target.y
+      );
+      elapsed += 50;
+
+      if (distance > tolerance) {
+        this.scene.time.delayedCall(50, checkArrival);
+      } else {
+        this.setVelocity(0, 0);
+        console.log("framme");
+        this.play("boss_summon", true);
+
+        const summonInterval = this.scene.time.addEvent({
+          delay: 2000,
+          callback: () => this.spawnDemon(),
+          loop: true,
+        });
+
+        const endTimer = this.scene.time.delayedCall(6000, () => {
+          summonInterval.remove();
+          this.state = "idle";
+          this.attackCooldown = false;
+          this.play("boss_idle", true);
+        });
+
+        this.currentAttackTimers.push(endTimer);
+      }
+    };
+
+    checkArrival();
   }
 
   private spawnDemon() {

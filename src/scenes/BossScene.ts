@@ -62,7 +62,7 @@ export default class BossScene extends Phaser.Scene {
     this.boss = new UndeadExecutioner(this, 600, 300);
     this.boss.setPlayer(this.player);
 
-    this.boss.body?.setSize(40, 70);
+    this.boss.body?.setSize(30, 60);
 
     this.physics.add.collider(this.player, this.ground);
     this.physics.add.collider(this.player, caveBounds);
