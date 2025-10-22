@@ -130,7 +130,7 @@ export default class UndeadExecutioner extends Boss {
     this.clearAttackTimers();
     this.state = "attacking";
 
-    const targetX = 550;
+    const targetX = 575;
     const targetY = 275;
     const speed = 250;
 
@@ -188,7 +188,7 @@ export default class UndeadExecutioner extends Boss {
     const possiblePositions = [
       { x: 300, y: 225 },
       { x: 800, y: 225 },
-      { x: 550, y: 275 },
+      { x: 575, y: 275 },
     ];
     const target = Phaser.Math.RND.pick(possiblePositions);
 

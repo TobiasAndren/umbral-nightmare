@@ -10,6 +10,7 @@ import { createPlayerAnimations } from "../animations/playerAnimations";
 import { createBossAnimations } from "../animations/bossAnimations";
 import UndeadExecutioner from "../bosses/UndeadExecutioner";
 import type Boss from "../bosses/Boss";
+import { createForestPlatforms } from "../environment/createForestPlatforms";
 
 export default class BossScene extends Phaser.Scene {
   private ground!: Phaser.Physics.Arcade.StaticGroup;
@@ -54,7 +55,18 @@ export default class BossScene extends Phaser.Scene {
       .setOrigin(1, 0.5)
       .refreshBody();
 
-    this.player = this.physics.add.sprite(300, 200, "player_idle");
+    this.platforms = createForestPlatforms(this, [
+      { x: 400, y: 355 },
+      { x: 300, y: 275 },
+      { x: 400, y: 195 },
+      { x: 495, y: 275 },
+      { x: 730, y: 195 },
+      { x: 830, y: 275 },
+      { x: 635, y: 275 },
+      { x: 730, y: 355 },
+    ]);
+
+    this.player = this.physics.add.sprite(250, 200, "player_idle");
     this.player.body?.setSize(15, 17);
     this.player.setCollideWorldBounds(true);
     this.player.setData("isInvincible");
@@ -62,8 +74,9 @@ export default class BossScene extends Phaser.Scene {
     this.boss = new UndeadExecutioner(this, 600, 300);
     this.boss.setPlayer(this.player);
 
-    this.boss.body?.setSize(30, 60);
+    this.boss.body?.setSize(30, 70);
 
+    this.physics.add.collider(this.player, this.platforms);
     this.physics.add.collider(this.player, this.ground);
     this.physics.add.collider(this.player, caveBounds);
     this.physics.add.collider(this.boss, this.ground);
