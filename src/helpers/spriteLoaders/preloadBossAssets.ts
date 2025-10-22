@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-export function preloadShadowEnemySprites(scene: Phaser.Scene) {
+export function preloadBossSprites(scene: Phaser.Scene) {
   const spriteConfigs = [
     {
       key: "boss_idle",
@@ -35,31 +35,27 @@ export function preloadShadowEnemySprites(scene: Phaser.Scene) {
     {
       key: "boss_summon_appear",
       file: "boss-summon-appear.png",
-      frameWidth: 100,
-      frameHeight: 100,
+      frameWidth: 50,
+      frameHeight: 50,
     },
     {
       key: "boss_summon_death",
       file: "boss-summon-death.png",
-      frameWidth: 100,
-      frameHeight: 100,
+      frameWidth: 50,
+      frameHeight: 50,
     },
     {
       key: "boss_summon_idle",
       file: "boss-summon-idle.png",
-      frameWidth: 100,
-      frameHeight: 100,
+      frameWidth: 50,
+      frameHeight: 50,
     },
   ];
 
   spriteConfigs.forEach((config) => {
-    scene.load.spritesheet(
-      config.key,
-      `/assets/enemies/shadow-enemy/${config.file}`,
-      {
-        frameWidth: config.frameWidth,
-        frameHeight: config.frameHeight,
-      }
-    );
+    scene.load.spritesheet(config.key, `/assets/boss/${config.file}`, {
+      frameWidth: config.frameWidth,
+      frameHeight: config.frameHeight,
+    });
   });
 }

@@ -13,7 +13,7 @@ export function createBossAnimations(scene: Phaser.Scene) {
     { key: "boss_skill", frameCount: 12, frameRate: 15, repeat: 0 },
     { key: "boss_attack", frameCount: 13, frameRate: 15, repeat: 0 },
     { key: "boss_death", frameCount: 17, frameRate: 15, repeat: 0 },
-    { key: "boss_summon", frameCount: 5, frameRate: 10, repeat: 0 },
+    { key: "boss_summon", frameCount: 5, frameRate: 10, repeat: -1 },
     { key: "boss_summon_appear", frameCount: 6, frameRate: 10, repeat: 0 },
     { key: "boss_summon_idle", frameCount: 4, frameRate: 10, repeat: 0 },
     { key: "boss_summon_death", frameCount: 6, frameRate: 10, repeat: 0 },

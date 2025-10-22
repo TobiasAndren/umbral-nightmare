@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import MainScene from "./scenes/MainScene";
+import BossScene from "./scenes/BossScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -13,7 +14,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: true,
     },
   },
-  scene: [MainScene],
+  scene: [BossScene],
   render: { pixelArt: true, roundPixels: true },
   scale: {
     mode: Phaser.Scale.FIT,
