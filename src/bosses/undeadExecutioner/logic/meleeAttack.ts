@@ -1,0 +1,83 @@
+import Phaser from "phaser";
+import UndeadExecutioner from "../UndeadExecutioner";
+
+export function performMeleeAttack(boss: UndeadExecutioner) {
+  if (!boss.player) return;
+
+  boss.clearAttackTimers();
+  boss.state = "attacking";
+
+  const attackRange = 85;
+  const speed = 200;
+
+  const checkDistance = () => {
+    if (!boss.player) return;
+
+    const distance = Phaser.Math.Distance.Between(
+      boss.x,
+      boss.y,
+      boss.player.x,
+      boss.player.y
+    );
+
+    if (distance > attackRange) {
+      boss.scene.physics.moveToObject(boss, boss.player, speed);
+      boss.scene.time.delayedCall(50, checkDistance);
+    } else {
+      boss.setVelocity(0, 0);
+
+      if (boss.player.x < boss.x) boss.setFlipX(true);
+
+      boss.play("boss_windup", true);
+
+      boss.scene.time.delayedCall(600, () => {
+        boss.play("boss_attack", true);
+
+        boss.scene.physics.add.overlap(
+          boss.meleeHitBox,
+          boss.player!,
+          (_hitbox, playerGO) => {
+            const player = playerGO as Phaser.Physics.Arcade.Sprite;
+            if (!player.getData("isInvincible")) {
+              player.emit("takeDamage", 1, boss.x);
+            }
+          }
+        );
+
+        const onFrameUpdate = (
+          _anim: Phaser.Animations.Animation,
+          frame: Phaser.Animations.AnimationFrame
+        ) => {
+          if (frame.index >= 2 && frame.index <= 4) {
+            enableHitbox(boss);
+          } else if (frame.index >= 9 && frame.index <= 11) {
+            enableHitbox(boss);
+          } else {
+            boss.meleeBody.enable = false;
+          }
+        };
+
+        boss.on(Phaser.Animations.Events.ANIMATION_UPDATE, onFrameUpdate);
+
+        boss.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+          boss.off(Phaser.Animations.Events.ANIMATION_UPDATE, onFrameUpdate);
+          boss.meleeBody.enable = false;
+        });
+      });
+
+      boss.endAttack(2200);
+    }
+  };
+
+  checkDistance();
+}
+
+function enableHitbox(boss: UndeadExecutioner, duration: number = 100) {
+  boss.meleeHitBox.x = boss.flipX ? boss.x - 40 : boss.x + 40;
+  boss.meleeHitBox.y = boss.y;
+  boss.meleeBody.enable = true;
+
+  boss.scene.time.delayedCall(duration, () => {
+    boss.meleeBody.enable = false;
+  });
+}

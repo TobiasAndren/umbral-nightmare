@@ -8,7 +8,7 @@ import { createForestGroundSegments } from "../environment/createForestGround";
 import { setupPlayerHealth } from "../player/playerHealth";
 import { createPlayerAnimations } from "../animations/playerAnimations";
 import { createBossAnimations } from "../animations/bossAnimations";
-import UndeadExecutioner from "../bosses/UndeadExecutioner";
+import UndeadExecutioner from "../bosses/undeadExecutioner/UndeadExecutioner";
 import type Boss from "../bosses/Boss";
 import { createForestPlatforms } from "../environment/createForestPlatforms";
 
@@ -69,7 +69,6 @@ export default class BossScene extends Phaser.Scene {
     this.player = this.physics.add.sprite(250, 200, "player_idle");
     this.player.body?.setSize(15, 17);
     this.player.setCollideWorldBounds(true);
-    this.player.setData("isInvincible");
 
     this.boss = new UndeadExecutioner(this, 600, 300);
     this.boss.setPlayer(this.player);
@@ -83,7 +82,7 @@ export default class BossScene extends Phaser.Scene {
     this.physics.add.collider(this.boss, caveBounds);
 
     setupPlayerControls(this.player, this);
-    setupPlayerHealth(this.player, this, 5);
+    setupPlayerHealth(this.player, this, 100);
 
     this.setupCamera();
   }

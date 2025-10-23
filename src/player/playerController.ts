@@ -29,7 +29,6 @@ export function setupPlayerControls(
     );
 
     if (attack.state.isAttacking) {
-      // Om man vill kan man låta attack-animation “override” movement animation
       if (!player.anims.isPlaying || player.anims.getName() !== "attack") {
         player.anims.play("attack", true);
       }

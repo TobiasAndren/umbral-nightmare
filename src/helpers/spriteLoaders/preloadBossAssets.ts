@@ -50,6 +50,12 @@ export function preloadBossSprites(scene: Phaser.Scene) {
       frameWidth: 50,
       frameHeight: 50,
     },
+    {
+      key: "boss_fireball",
+      file: "boss-fireball.png",
+      frameWidth: 68,
+      frameHeight: 9,
+    },
   ];
 
   spriteConfigs.forEach((config) => {

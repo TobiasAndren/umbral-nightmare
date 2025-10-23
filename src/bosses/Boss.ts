@@ -5,7 +5,7 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
   protected currentHealth: number;
   protected isHurt = false;
   protected isDead = false;
-  protected player?: Phaser.Physics.Arcade.Sprite;
+  public player?: Phaser.Physics.Arcade.Sprite;
 
   public state: "idle" | "attacking" | "dead" = "idle";
 

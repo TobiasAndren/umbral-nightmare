@@ -73,7 +73,7 @@ export function setupPlayerHealth(
 
     player.anims.play("hurt", true);
     player.setData("isInvincible", true);
-    scene.time.delayedCall(1000, () => {
+    scene.time.delayedCall(500, () => {
       player.setData("isInvincible", false);
     });
 
