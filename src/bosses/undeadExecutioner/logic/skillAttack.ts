@@ -16,7 +16,7 @@ export function performSkillMove(boss: UndeadExecutioner) {
       const ringTimer = boss.scene.time.delayedCall(i * 300, () =>
         spawnProjectileRing(boss)
       );
-      boss["currentAttackTimers"].push(ringTimer);
+      boss.currentAttackTimers.push(ringTimer);
     }
 
     boss.endAttack(4000);

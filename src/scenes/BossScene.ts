@@ -69,6 +69,7 @@ export default class BossScene extends Phaser.Scene {
     this.player = this.physics.add.sprite(250, 200, "player_idle");
     this.player.body?.setSize(15, 17);
     this.player.setCollideWorldBounds(true);
+    this.player.setData("isInvincible");
 
     this.boss = new UndeadExecutioner(this, 600, 300);
     this.boss.setPlayer(this.player);

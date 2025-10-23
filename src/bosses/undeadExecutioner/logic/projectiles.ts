@@ -11,18 +11,29 @@ export function spawnProjectileRing(boss: UndeadExecutioner) {
       "boss_fireball"
     ) as Phaser.Physics.Arcade.Sprite;
 
-    proj.setVelocity(velocity.x, velocity.y);
-    proj.setOrigin(0.5, 0.5);
     proj.play("boss_fireball");
+
+    const hitboxRadius = 4.5;
+    proj.body?.setCircle(hitboxRadius);
+
+    const fireballVisualX = 8;
+    const fireballVisualY = 4.5;
+
+    proj.body?.setOffset(
+      fireballVisualX - hitboxRadius,
+      fireballVisualY - hitboxRadius
+    );
+
+    proj.setOrigin(fireballVisualX / proj.width, 0.5);
+
     proj.rotation =
       Phaser.Math.Angle.Between(0, 0, velocity.x, velocity.y) + Math.PI;
 
-    proj.body?.setCircle(4);
-    proj.body?.setOffset(proj.width / 2 - 4, proj.height / 2 - 4);
+    proj.setVelocity(velocity.x, velocity.y);
 
     const destroyTimer = boss.scene.time.delayedCall(3000, () =>
       proj.destroy()
     );
-    boss["currentAttackTimers"].push(destroyTimer);
+    boss.currentAttackTimers.push(destroyTimer);
   }
 }

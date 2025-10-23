@@ -28,7 +28,7 @@ export function performSummon(boss: UndeadExecutioner) {
       boss.play("boss_idle", true);
     });
 
-    boss["currentAttackTimers"].push(endTimer);
+    boss.currentAttackTimers.push(endTimer);
   });
 }
 
@@ -36,5 +36,5 @@ function spawnDemon(boss: UndeadExecutioner) {
   const demon = boss.scene.physics.add.sprite(boss.x, boss.y, "demon_idle");
   demon.setVelocityY(100);
   const destroy = boss.scene.time.delayedCall(5000, () => demon.destroy());
-  boss["currentAttackTimers"].push(destroy);
+  boss.currentAttackTimers.push(destroy);
 }
