@@ -3,7 +3,7 @@ import UndeadExecutioner from "../UndeadExecutioner";
 
 export function spawnProjectileRing(boss: UndeadExecutioner) {
   const origin = new Phaser.Math.Vector2(boss.x, boss.y);
-  for (let angle = 0; angle < 360; angle += 45) {
+  for (let angle = 0; angle < 360; angle += 10) {
     const velocity = boss.scene.physics.velocityFromAngle(angle, 200);
     const proj = boss.projectileGroup.create(
       origin.x,

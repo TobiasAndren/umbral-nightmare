@@ -9,13 +9,12 @@ import { setupPlayerHealth } from "../player/playerHealth";
 import { createPlayerAnimations } from "../animations/playerAnimations";
 import { createBossAnimations } from "../animations/bossAnimations";
 import UndeadExecutioner from "../bosses/undeadExecutioner/UndeadExecutioner";
-import type Boss from "../bosses/Boss";
 import { createForestPlatforms } from "../environment/createForestPlatforms";
 
 export default class BossScene extends Phaser.Scene {
   private ground!: Phaser.Physics.Arcade.StaticGroup;
   private player!: Phaser.Physics.Arcade.Sprite;
-  private boss!: Boss;
+  private boss!: UndeadExecutioner;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
 
   constructor() {
@@ -81,6 +80,39 @@ export default class BossScene extends Phaser.Scene {
     this.physics.add.collider(this.player, caveBounds);
     this.physics.add.collider(this.boss, this.ground);
     this.physics.add.collider(this.boss, caveBounds);
+
+    this.physics.add.collider(
+      this.boss.projectileGroup,
+      this.platforms,
+      (projectile) => {
+        (projectile as Phaser.Physics.Arcade.Sprite).destroy();
+      }
+    );
+    this.physics.add.collider(
+      this.boss.projectileGroup,
+      this.ground,
+      (projectile) => {
+        (projectile as Phaser.Physics.Arcade.Sprite).destroy();
+      }
+    );
+    this.physics.add.collider(
+      this.boss.projectileGroup,
+      caveBounds,
+      (projectile) => {
+        (projectile as Phaser.Physics.Arcade.Sprite).destroy();
+      }
+    );
+    this.physics.add.overlap(
+      this.boss.projectileGroup,
+      this.player,
+      (playerObj, projectileObj) => {
+        const player = playerObj as Phaser.Physics.Arcade.Sprite;
+        const projectile = projectileObj as Phaser.Physics.Arcade.Sprite;
+
+        projectile.destroy();
+        player.emit("takeDamage", 1, projectile.x);
+      }
+    );
 
     setupPlayerControls(this.player, this);
     setupPlayerHealth(this.player, this, 100);

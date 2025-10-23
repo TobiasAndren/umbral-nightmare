@@ -48,7 +48,7 @@ export function performMeleeAttack(boss: UndeadExecutioner) {
           _anim: Phaser.Animations.Animation,
           frame: Phaser.Animations.AnimationFrame
         ) => {
-          if (frame.index >= 2 && frame.index <= 4) {
+          if (frame.index >= 1 && frame.index <= 4) {
             enableHitbox(boss);
           } else if (frame.index >= 9 && frame.index <= 11) {
             enableHitbox(boss);

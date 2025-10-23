@@ -54,7 +54,7 @@ export default class UndeadExecutioner extends Boss {
     this.attackCooldown = true;
     this.state = "attacking";
 
-    const pattern = Phaser.Math.RND.pick(["skill"]);
+    const pattern = Phaser.Math.RND.pick(["melee", "skill", "summon"]);
 
     switch (pattern) {
       case "melee":
