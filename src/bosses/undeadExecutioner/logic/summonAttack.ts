@@ -16,12 +16,13 @@ export function performSummon(boss: UndeadExecutioner) {
     boss.play("boss_summon", true);
 
     const summonInterval = boss.scene.time.addEvent({
-      delay: 2000,
-      callback: () => spawnDemon(boss),
+      delay: 7000,
       loop: true,
+      callback: () => spawnDemons(boss),
+      startAt: 6000,
     });
 
-    const endTimer = boss.scene.time.delayedCall(6000, () => {
+    const endTimer = boss.scene.time.delayedCall(100000, () => {
       summonInterval.remove();
       boss.state = "idle";
       boss.attackCooldown = false;
@@ -32,9 +33,57 @@ export function performSummon(boss: UndeadExecutioner) {
   });
 }
 
-function spawnDemon(boss: UndeadExecutioner) {
-  const demon = boss.scene.physics.add.sprite(boss.x, boss.y, "demon_idle");
-  demon.setVelocityY(100);
-  const destroy = boss.scene.time.delayedCall(5000, () => demon.destroy());
-  boss.currentAttackTimers.push(destroy);
+function spawnDemons(boss: UndeadExecutioner) {
+  const player = boss.player as Phaser.Physics.Arcade.Sprite;
+  const spawnOffset = [
+    { x: -40, y: -40 },
+    { x: 40, y: -40 },
+    { x: -40, y: 40 },
+    { x: 40, y: 40 },
+  ];
+
+  spawnOffset.forEach((offset) => {
+    const demon = boss.scene.physics.add.sprite(
+      boss.x + offset.x,
+      boss.y + offset.y,
+      "boss_summon_idle"
+    );
+
+    demon.body.setSize(25, 25);
+
+    demon.body.allowGravity = false;
+
+    demon.play("boss_summon_appear", true);
+    demon.setData("speed", 100);
+    demon.setData("target", player);
+
+    boss.scene.physics.add.overlap(demon, player, () => {
+      player.emit("takeDamage", 1, demon.x);
+      demon.destroy();
+    });
+
+    demon.on("animationcomplete", (anim: Phaser.Animations.Animation) => {
+      if (anim.key === "boss_summon_appear") {
+        demon.play("boss_summon_idle", true);
+
+        demon.update = () => {
+          if (!demon.active || !player.active) return;
+
+          const angle = Phaser.Math.Angle.Between(
+            demon.x,
+            demon.y,
+            player.x,
+            player.y
+          );
+          demon.setVelocity(
+            Math.cos(angle) * demon.getData("speed"),
+            Math.sin(angle) * demon.getData("speed")
+          );
+          demon.setRotation(angle + (3 * Math.PI) / 2);
+        };
+
+        boss.scene.events.on("update", demon.update, demon);
+      }
+    });
+  });
 }
