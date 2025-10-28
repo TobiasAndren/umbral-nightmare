@@ -48,6 +48,7 @@ export default class UndeadExecutioner extends Boss {
   }
 
   private idleLogic() {
+    if (!this.active || this.isDead) return;
     if (this.attackCooldown || this.state === "attacking") return;
 
     this.attackCooldown = true;
@@ -69,6 +70,8 @@ export default class UndeadExecutioner extends Boss {
   }
 
   public endAttack(delay: number = 4000) {
+    if (!this.active || this.isDead) return;
+
     const timer = this.scene.time.delayedCall(delay, () => {
       this.clearAttackTimers();
       this.state = "idle";
@@ -85,4 +88,9 @@ export default class UndeadExecutioner extends Boss {
   }
 
   public moveToAndWait = moveToAndWait.bind(this);
+
+  protected onDeath() {
+    this.clearAttackTimers();
+    this.setVelocity(0, 0);
+  }
 }

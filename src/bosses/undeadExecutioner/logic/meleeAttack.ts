@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import UndeadExecutioner from "../UndeadExecutioner";
 
 export function performMeleeAttack(boss: UndeadExecutioner) {
+  if (!boss.active || boss.isDead) return;
   if (!boss.player) return;
 
   boss.clearAttackTimers();
@@ -24,6 +25,8 @@ export function performMeleeAttack(boss: UndeadExecutioner) {
       boss.scene.physics.moveToObject(boss, boss.player, speed);
       boss.scene.time.delayedCall(50, checkDistance);
     } else {
+      if (!boss.active || boss.isDead) return;
+
       boss.setVelocity(0, 0);
 
       if (boss.player.x < boss.x) boss.setFlipX(true);
@@ -31,6 +34,8 @@ export function performMeleeAttack(boss: UndeadExecutioner) {
       boss.play("boss_windup", true);
 
       boss.scene.time.delayedCall(600, () => {
+        if (!boss.active || boss.isDead) return;
+
         boss.play("boss_attack", true);
 
         boss.scene.physics.add.overlap(
@@ -48,6 +53,8 @@ export function performMeleeAttack(boss: UndeadExecutioner) {
           _anim: Phaser.Animations.Animation,
           frame: Phaser.Animations.AnimationFrame
         ) => {
+          if (!boss.active || boss.isDead) return;
+
           if (frame.index >= 1 && frame.index <= 4) {
             enableHitbox(boss);
           } else if (frame.index >= 9 && frame.index <= 11) {

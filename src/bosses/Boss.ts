@@ -4,7 +4,7 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
   protected maxHealth: number;
   protected currentHealth: number;
   protected isHurt = false;
-  protected isDead = false;
+  public isDead = false;
   public player?: Phaser.Physics.Arcade.Sprite;
 
   public state: "idle" | "attacking" | "dead" = "idle";
@@ -12,7 +12,7 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
     super(scene, x, y, texture);
 
-    this.maxHealth = 20;
+    this.maxHealth = 1;
     this.currentHealth = this.maxHealth;
 
     scene.add.existing(this);
@@ -53,6 +53,8 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
     this.state = "dead";
     this.setVelocity(0, 0);
 
+    this.onDeath();
+
     if (this.scene.anims.exists("boss_death")) {
       this.play("boss_death");
 
@@ -65,4 +67,6 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
       this.destroy();
     }
   }
+
+  protected onDeath() {}
 }

@@ -11,6 +11,7 @@ export function performSkillMove(boss: UndeadExecutioner) {
   const attackDelay = 500;
 
   boss.moveToAndWait(targetX, targetY, speed, () => {
+    if (!boss.active || boss.isDead) return;
     boss.play("boss_skill", true);
     const delayTimer = boss.scene.time.delayedCall(attackDelay, () => {
       for (let i = 0; i < 4; i++) {

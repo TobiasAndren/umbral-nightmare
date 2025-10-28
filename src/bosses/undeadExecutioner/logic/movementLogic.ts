@@ -23,6 +23,7 @@ export function moveToAndWait(
 }
 
 export function handleMovementUpdate(boss: UndeadExecutioner) {
+  if (!boss.active || boss.isDead) return;
   const body = boss.body as Phaser.Physics.Arcade.Body;
 
   if (body.velocity.x < 0) boss.setFlipX(true);

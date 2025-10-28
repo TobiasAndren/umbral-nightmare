@@ -3,6 +3,7 @@ import UndeadExecutioner from "../UndeadExecutioner";
 import Demon from "../UndeadExecutionerSummon";
 
 export function performSummon(boss: UndeadExecutioner) {
+  if (!boss.active || boss.isDead) return;
   boss.clearAttackTimers();
   boss.state = "attacking";
 
@@ -35,6 +36,8 @@ export function performSummon(boss: UndeadExecutioner) {
 }
 
 function spawnDemons(boss: UndeadExecutioner) {
+  if (!boss.active || boss.isDead) return;
+
   const player = boss.player as Phaser.Physics.Arcade.Sprite;
   const spawnOffset = [
     { x: -40, y: -40 },
