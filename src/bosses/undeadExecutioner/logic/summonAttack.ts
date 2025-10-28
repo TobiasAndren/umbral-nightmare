@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import UndeadExecutioner from "../UndeadExecutioner";
+import Demon from "../UndeadExecutionerSummon";
 
 export function performSummon(boss: UndeadExecutioner) {
   boss.clearAttackTimers();
@@ -16,13 +17,13 @@ export function performSummon(boss: UndeadExecutioner) {
     boss.play("boss_summon", true);
 
     const summonInterval = boss.scene.time.addEvent({
-      delay: 7000,
+      delay: 6000,
       loop: true,
       callback: () => spawnDemons(boss),
-      startAt: 6000,
+      startAt: 5000,
     });
 
-    const endTimer = boss.scene.time.delayedCall(100000, () => {
+    const endTimer = boss.scene.time.delayedCall(8000, () => {
       summonInterval.remove();
       boss.state = "idle";
       boss.attackCooldown = false;
@@ -43,19 +44,26 @@ function spawnDemons(boss: UndeadExecutioner) {
   ];
 
   spawnOffset.forEach((offset) => {
-    const demon = boss.scene.physics.add.sprite(
+    const demon = new Demon(
+      boss.scene,
       boss.x + offset.x,
       boss.y + offset.y,
       "boss_summon_idle"
     );
 
-    demon.body.setSize(25, 25);
+    boss.scene.add.existing(demon);
+    boss.scene.physics.add.existing(demon);
 
-    demon.body.allowGravity = false;
-
-    demon.play("boss_summon_appear", true);
+    demon.body?.setSize(25, 25);
+    (demon.body as Phaser.Physics.Arcade.Body).allowGravity = false;
     demon.setData("speed", 100);
     demon.setData("target", player);
+
+    if (boss.scene.addEnemy) {
+      boss.scene.addEnemy(demon);
+    }
+
+    demon.play("boss_summon_appear", true);
 
     boss.scene.physics.add.overlap(demon, player, () => {
       player.emit("takeDamage", 1, demon.x);

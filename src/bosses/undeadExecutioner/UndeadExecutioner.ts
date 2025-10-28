@@ -19,7 +19,6 @@ export default class UndeadExecutioner extends Boss {
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, "boss_idle");
-    (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
 
     this.projectileGroup = this.scene.physics.add.group({
       allowGravity: false,
@@ -54,7 +53,7 @@ export default class UndeadExecutioner extends Boss {
     this.attackCooldown = true;
     this.state = "attacking";
 
-    const pattern = Phaser.Math.RND.pick(["summon"]);
+    const pattern = Phaser.Math.RND.pick(["melee", "skill", "summon"]);
 
     switch (pattern) {
       case "melee":

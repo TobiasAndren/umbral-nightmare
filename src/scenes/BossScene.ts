@@ -16,6 +16,11 @@ export default class BossScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private boss!: UndeadExecutioner;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
+  private enemies!: Phaser.Physics.Arcade.Group;
+
+  public addEnemy(enemy: Phaser.Physics.Arcade.Sprite) {
+    this.enemies.add(enemy);
+  }
 
   constructor() {
     super("BossScene");
@@ -70,10 +75,17 @@ export default class BossScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
     this.player.setData("isInvincible");
 
+    this.enemies = this.physics.add.group({
+      runChildUpdate: true,
+      allowGravity: false,
+    });
+
     this.boss = new UndeadExecutioner(this, 575, 275);
     this.boss.setPlayer(this.player);
 
     this.boss.body?.setSize(30, 70);
+
+    this.enemies.add(this.boss);
 
     this.physics.add.collider(this.player, this.platforms);
     this.physics.add.collider(this.player, this.ground);
@@ -114,7 +126,7 @@ export default class BossScene extends Phaser.Scene {
       }
     );
 
-    setupPlayerControls(this.player, this);
+    setupPlayerControls(this.player, this, this.enemies);
     setupPlayerHealth(this.player, this, 100);
 
     this.setupCamera();

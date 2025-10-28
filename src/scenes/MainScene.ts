@@ -78,7 +78,7 @@ export default class MainScene extends Phaser.Scene {
       { x: 1200, y: 400 },
       { x: 1500, y: 380 },
       { x: 2000, y: 400 },
-      { x: 3700, y: 200 },
+      { x: 3800, y: 200 },
       { x: 4000, y: 200 },
     ];
 

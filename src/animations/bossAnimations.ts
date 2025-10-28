@@ -9,13 +9,13 @@ interface AnimConfig {
 
 export function createBossAnimations(scene: Phaser.Scene) {
   const animations: AnimConfig[] = [
-    { key: "boss_idle", frameCount: 4, frameRate: 10, repeat: -1 },
+    { key: "boss_idle", frameCount: 4, frameRate: 5, repeat: -1 },
     { key: "boss_skill", frameCount: 12, frameRate: 12, repeat: -1 },
     { key: "boss_attack", frameCount: 11, frameRate: 10, repeat: 0 },
     { key: "boss_death", frameCount: 17, frameRate: 15, repeat: 0 },
     { key: "boss_summon", frameCount: 5, frameRate: 8, repeat: -1 },
     { key: "boss_summon_appear", frameCount: 6, frameRate: 3, repeat: 0 },
-    { key: "boss_summon_idle", frameCount: 4, frameRate: 10, repeat: 0 },
+    { key: "boss_summon_idle", frameCount: 4, frameRate: 4, repeat: -1 },
     { key: "boss_summon_death", frameCount: 6, frameRate: 10, repeat: 0 },
     { key: "boss_fireball", frameCount: 54, frameRate: 15, repeat: -1 },
   ];
