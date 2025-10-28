@@ -12,7 +12,7 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
     super(scene, x, y, texture);
 
-    this.maxHealth = 1;
+    this.maxHealth = 20;
     this.currentHealth = this.maxHealth;
 
     scene.add.existing(this);

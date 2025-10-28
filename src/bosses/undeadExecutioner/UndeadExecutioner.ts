@@ -12,6 +12,7 @@ export default class UndeadExecutioner extends Boss {
   public moveTarget?: Phaser.Math.Vector2;
   public moveCallback?: () => void;
   public moveHasStarted: boolean = false;
+  private lastAttack: string = "";
 
   public meleeHitBox!: Phaser.GameObjects.Rectangle;
   public meleeBody!: Phaser.Physics.Arcade.Body;
@@ -54,7 +55,13 @@ export default class UndeadExecutioner extends Boss {
     this.attackCooldown = true;
     this.state = "attacking";
 
-    const pattern = Phaser.Math.RND.pick(["melee", "skill", "summon"]);
+    let pattern: "melee" | "skill" | "summon";
+
+    do {
+      pattern = Phaser.Math.RND.pick(["melee", "skill", "summon"]);
+    } while (pattern === this.lastAttack);
+
+    this.lastAttack = pattern;
 
     switch (pattern) {
       case "melee":
@@ -69,7 +76,7 @@ export default class UndeadExecutioner extends Boss {
     }
   }
 
-  public endAttack(delay: number = 4000) {
+  public endAttack(delay: number = 2000) {
     if (!this.active || this.isDead) return;
 
     const timer = this.scene.time.delayedCall(delay, () => {

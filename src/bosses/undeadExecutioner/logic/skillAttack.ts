@@ -21,7 +21,12 @@ export function performSkillMove(boss: UndeadExecutioner) {
         boss.currentAttackTimers.push(ringTimer);
       }
 
-      boss.endAttack(3250);
+      boss.scene.time.delayedCall(3250, () => {
+        if (!boss.active || boss.isDead) return;
+
+        boss.play("boss_idle");
+        boss.endAttack(1500);
+      });
     });
 
     boss.currentAttackTimers.push(delayTimer);

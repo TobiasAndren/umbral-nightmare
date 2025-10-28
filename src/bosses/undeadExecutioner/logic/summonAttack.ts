@@ -26,9 +26,9 @@ export function performSummon(boss: UndeadExecutioner) {
 
     const endTimer = boss.scene.time.delayedCall(8000, () => {
       summonInterval.remove();
-      boss.state = "idle";
-      boss.attackCooldown = false;
-      boss.play("boss_idle", true);
+      if (!boss.active || boss.isDead) return;
+      boss.play("boss_idle");
+      boss.endAttack(1750);
     });
 
     boss.currentAttackTimers.push(endTimer);
@@ -38,12 +38,12 @@ export function performSummon(boss: UndeadExecutioner) {
 function spawnDemons(boss: UndeadExecutioner) {
   if (!boss.active || boss.isDead) return;
 
+  const scene = boss.scene as any;
   const player = boss.player as Phaser.Physics.Arcade.Sprite;
   const spawnOffset = [
     { x: -40, y: -40 },
+    { x: 0, y: -60 },
     { x: 40, y: -40 },
-    { x: -40, y: 40 },
-    { x: 40, y: 40 },
   ];
 
   spawnOffset.forEach((offset) => {
@@ -54,16 +54,16 @@ function spawnDemons(boss: UndeadExecutioner) {
       "boss_summon_idle"
     );
 
-    boss.scene.add.existing(demon);
-    boss.scene.physics.add.existing(demon);
+    scene.add.existing(demon);
+    scene.physics.add.existing(demon);
 
     demon.body?.setSize(25, 25);
     (demon.body as Phaser.Physics.Arcade.Body).allowGravity = false;
     demon.setData("speed", 100);
     demon.setData("target", player);
 
-    if (boss.scene.addEnemy) {
-      boss.scene.addEnemy(demon);
+    if (scene.addEnemy) {
+      scene.addEnemy(demon);
     }
 
     demon.play("boss_summon_appear", true);
@@ -93,7 +93,9 @@ function spawnDemons(boss: UndeadExecutioner) {
           demon.setRotation(angle + (3 * Math.PI) / 2);
         };
 
-        boss.scene.events.on("update", demon.update, demon);
+        if (boss.scene && boss.scene.events) {
+          boss.scene.events.on("update", demon.update, demon);
+        }
       }
     });
   });

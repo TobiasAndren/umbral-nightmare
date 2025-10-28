@@ -72,7 +72,12 @@ export function performMeleeAttack(boss: UndeadExecutioner) {
         });
       });
 
-      boss.endAttack(2200);
+      boss.scene.time.delayedCall(1750, () => {
+        if (!boss.active || boss.isDead) return;
+
+        boss.play("boss_idle");
+        boss.endAttack(1000);
+      });
     }
   };
 
