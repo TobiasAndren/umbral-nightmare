@@ -18,7 +18,6 @@ import {
 } from "../helpers/backgroundLoaders/preloadCaveBackground";
 
 export default class BossScene extends Phaser.Scene {
-  private backgroundLayers?: {};
   private ground!: Phaser.Physics.Arcade.StaticGroup;
   private walls!: Phaser.Physics.Arcade.StaticGroup;
   private ceiling!: Phaser.Physics.Arcade.StaticGroup;
@@ -44,7 +43,7 @@ export default class BossScene extends Phaser.Scene {
   }
 
   create() {
-    this.backgroundLayers = createCaveBackground(this);
+    createCaveBackground(this);
     this.ground = createCaveGroundSegments(this, [{ x: 180, width: 750 }]);
 
     createPlayerAnimations(this);
