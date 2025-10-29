@@ -3,16 +3,25 @@ import { preloadPlayerHealth } from "../helpers/uiLoaders/preloadPlayerHealth";
 import { preloadPlayerSprites } from "../helpers/spriteLoaders/preloadPlayerAssets";
 import { preloadBossSprites } from "../helpers/spriteLoaders/preloadBossAssets";
 import { setupPlayerControls } from "../player/playerController";
-import { preloadForestTiles } from "../helpers/environmentLoaders/preloadForestTiles";
-import { createForestGroundSegments } from "../environment/createForestGround";
+import { createCaveGroundSegments } from "../environment/createCaveGround";
+import { createCavePlatforms } from "../environment/createCavePlatforms";
 import { setupPlayerHealth } from "../player/playerHealth";
 import { createPlayerAnimations } from "../animations/playerAnimations";
 import { createBossAnimations } from "../animations/bossAnimations";
 import UndeadExecutioner from "../bosses/undeadExecutioner/UndeadExecutioner";
-import { createForestPlatforms } from "../environment/createForestPlatforms";
+import { preloadCaveTiles } from "../helpers/environmentLoaders/preloadCaveTiles";
+import { createCaveCeiling } from "../environment/createCaveCeiling";
+import { createCaveWalls } from "../environment/createCaveWalls";
+import {
+  createCaveBackground,
+  preloadCaveBackground,
+} from "../helpers/backgroundLoaders/preloadCaveBackground";
 
 export default class BossScene extends Phaser.Scene {
+  private backgroundLayers?: {};
   private ground!: Phaser.Physics.Arcade.StaticGroup;
+  private walls!: Phaser.Physics.Arcade.StaticGroup;
+  private ceiling!: Phaser.Physics.Arcade.StaticGroup;
   private player!: Phaser.Physics.Arcade.Sprite;
   private boss!: UndeadExecutioner;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
@@ -27,39 +36,40 @@ export default class BossScene extends Phaser.Scene {
   }
 
   preload() {
+    preloadCaveBackground(this);
     preloadPlayerHealth(this);
     preloadPlayerSprites(this);
     preloadBossSprites(this);
-    preloadForestTiles(this);
+    preloadCaveTiles(this);
   }
 
   create() {
-    this.ground = createForestGroundSegments(this, [{ x: 200, width: 800 }]);
+    this.backgroundLayers = createCaveBackground(this);
+    this.ground = createCaveGroundSegments(this, [{ x: 180, width: 750 }]);
 
     createPlayerAnimations(this);
     createBossAnimations(this);
 
     const caveBounds = this.physics.add.staticGroup();
 
-    caveBounds
-      .create(550, 80, "platform")
-      .setScale(25, 1)
-      .setOrigin(0.5, 0)
-      .refreshBody();
+    this.ceiling = createCaveCeiling(this, [{ x: 555, width: 750 }]);
 
-    caveBounds
-      .create(180, 270, "platform")
-      .setScale(1, 11)
-      .setOrigin(0, 0.5)
-      .refreshBody();
+    this.walls = createCaveWalls(this, [
+      {
+        x: 190,
+        y: 270,
+        height: 370,
+        side: "left",
+      },
+      {
+        x: 930,
+        y: 270,
+        height: 370,
+        side: "right",
+      },
+    ]);
 
-    caveBounds
-      .create(940, 270, "platform")
-      .setScale(1, 11)
-      .setOrigin(1, 0.5)
-      .refreshBody();
-
-    this.platforms = createForestPlatforms(this, [
+    this.platforms = createCavePlatforms(this, [
       { x: 400, y: 355 },
       { x: 300, y: 275 },
       { x: 400, y: 195 },
@@ -89,6 +99,8 @@ export default class BossScene extends Phaser.Scene {
 
     this.physics.add.collider(this.player, this.platforms);
     this.physics.add.collider(this.player, this.ground);
+    this.physics.add.collider(this.player, this.walls);
+    this.physics.add.collider(this.player, this.ceiling);
     this.physics.add.collider(this.player, caveBounds);
     this.physics.add.collider(this.boss, this.ground);
     this.physics.add.collider(this.boss, caveBounds);
