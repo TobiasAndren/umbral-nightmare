@@ -3,19 +3,19 @@ import Phaser from "phaser";
 export function preloadForestBackground(scene: Phaser.Scene) {
   scene.load.image(
     "forest_bg",
-    "assets/backgrounds/layers/parallax-demon-woods-bg.png"
+    "assets/backgrounds/forest/layers/parallax-demon-woods-bg.png"
   );
   scene.load.image(
     "close_trees",
-    "assets/backgrounds/layers/parallax-demon-woods-close-trees.png"
+    "assets/backgrounds/forest/layers/parallax-demon-woods-close-trees.png"
   );
   scene.load.image(
     "far_trees",
-    "assets/backgrounds/layers/parallax-demon-woods-far-trees.png"
+    "assets/backgrounds/forest/layers/parallax-demon-woods-far-trees.png"
   );
   scene.load.image(
     "mid_trees",
-    "assets/backgrounds/layers/parallax-demon-woods-mid-trees.png"
+    "assets/backgrounds/forest/layers/parallax-demon-woods-mid-trees.png"
   );
 }
 

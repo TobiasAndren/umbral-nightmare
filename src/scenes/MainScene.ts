@@ -1,17 +1,17 @@
 import Phaser from "phaser";
 import { setupPlayerControls } from "../player/playerController";
-import { createGroundSegments } from "../environment/createGround";
+import { createForestGroundSegments } from "../environment/createForestGround";
 import { preloadPlayerSprites } from "../helpers/spriteLoaders/preloadPlayerAssets";
-import { createPlayerAnimations } from "../player/playerAnimations";
+import { createPlayerAnimations } from "../animations/playerAnimations";
 import { preloadShadowEnemySprites } from "../helpers/spriteLoaders/preloadShadowEnemyAssets";
-import { createShadowEnemyAnimations } from "../enemies/shadowEnemyAnimations";
+import { createShadowEnemyAnimations } from "../animations/shadowEnemyAnimations";
 import ShadowEnemy from "../enemies/ShadowEnemy";
 import {
   createForestBackground,
   preloadForestBackground,
 } from "../helpers/backgroundLoaders/preloadForestBackground";
 import { preloadForestTiles } from "../helpers/environmentLoaders/preloadForestTiles";
-import { createPlatforms } from "../environment/createPlatforms";
+import { createForestPlatforms } from "../environment/createForestPlatforms";
 import { preloadPlayerHealth } from "../helpers/uiLoaders/preloadPlayerHealth";
 import { setupPlayerHealth } from "../player/playerHealth";
 
@@ -44,14 +44,14 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.backgroundLayers = createForestBackground(this);
 
-    this.ground = createGroundSegments(this, [
+    this.ground = createForestGroundSegments(this, [
       { x: 0, width: 800 },
       { x: 1000, width: 600 },
       { x: 1900, width: 700 },
       { x: 3400, width: 1000, y: 300 },
     ]);
 
-    this.platforms = createPlatforms(this, [
+    this.platforms = createForestPlatforms(this, [
       { x: 900, y: 375 },
       { x: 1700, y: 365 },
       { x: 1800, y: 390 },
@@ -78,7 +78,7 @@ export default class MainScene extends Phaser.Scene {
       { x: 1200, y: 400 },
       { x: 1500, y: 380 },
       { x: 2000, y: 400 },
-      { x: 3700, y: 200 },
+      { x: 3800, y: 200 },
       { x: 4000, y: 200 },
     ];
 
