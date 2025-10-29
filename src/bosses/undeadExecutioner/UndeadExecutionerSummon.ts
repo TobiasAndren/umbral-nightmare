@@ -6,7 +6,7 @@ export default class Demon extends Phaser.Physics.Arcade.Sprite {
   protected isHurt = false;
   protected isDead = false;
 
-  private takeDamage(amount: number) {
+  protected takeDamage(amount: number) {
     if (this.isDead || this.isHurt) return;
 
     this.currentHealth -= amount;

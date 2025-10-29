@@ -27,7 +27,7 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
     this.player = player;
   }
 
-  private takeDamage(amount: number) {
+  protected takeDamage(amount: number) {
     if (this.isDead || this.isHurt) return;
 
     this.currentHealth -= amount;
