@@ -66,7 +66,10 @@ export default class MainScene extends Phaser.Scene {
     createShadowEnemyAnimations(this);
 
     this.player = this.physics.add.sprite(250, 400, "player_idle");
-    this.player.body?.setSize(15, 17);
+    this.player.body?.setSize(15, 15);
+    this.player.setDepth(1);
+
+    this.player.setTint(0xffffff);
 
     this.enemies = this.physics.add.group({
       runChildUpdate: true,

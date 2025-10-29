@@ -11,10 +11,10 @@ const config: Phaser.Types.Core.GameConfig = {
     default: "arcade",
     arcade: {
       gravity: { y: 500, x: 0 },
-      debug: true,
+      debug: false,
     },
   },
-  scene: [BossScene],
+  scene: [MainScene],
   render: { pixelArt: true, roundPixels: true },
   scale: {
     mode: Phaser.Scale.FIT,

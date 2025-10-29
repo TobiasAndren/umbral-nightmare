@@ -27,6 +27,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.isHurt = true;
 
+    this.setTintFill(0x880200);
+
     const hurtKey = this.hurtAnimKey;
     if (hurtKey && this.scene.anims.exists(hurtKey)) {
       this.play(hurtKey, true);
@@ -37,13 +39,17 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityX(150 * direction);
       this.setDrag(600);
 
-      this.scene.time.delayedCall(200, () => {
+      this.scene.time.delayedCall(100, () => {
+        this.clearTint();
+      });
+
+      this.scene.time.delayedCall(300, () => {
         this.setVelocityX(0);
         this.isHurt = false;
         this.setDrag(0);
       });
     } else {
-      this.scene.time.delayedCall(200, () => {
+      this.scene.time.delayedCall(300, () => {
         this.isHurt = false;
       });
     }

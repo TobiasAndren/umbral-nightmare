@@ -65,5 +65,11 @@ export function createForestBackground(scene: Phaser.Scene) {
     .setScrollFactor(0, 0)
     .setDepth(0);
 
-  return { bg, far, mid, close };
+  const overlay = scene.add
+    .rectangle(0, 0, width, height, 0xffffff, 0.1)
+    .setOrigin(0)
+    .setScrollFactor(0)
+    .setDepth(0);
+
+  return { bg, far, mid, close, overlay };
 }
