@@ -35,6 +35,7 @@ export default class BossScene extends Phaser.Scene {
   }
 
   preload() {
+    console.log("bossscene preload started");
     preloadCaveBackground(this);
     preloadPlayerHealth(this);
     preloadPlayerSprites(this);
@@ -43,6 +44,9 @@ export default class BossScene extends Phaser.Scene {
   }
 
   create() {
+    this.cameras.main.fadeIn(800, 0, 0, 0);
+    console.log("bossscene loaded");
+
     createCaveBackground(this);
     this.ground = createCaveGroundSegments(this, [{ x: 180, width: 750 }]);
 

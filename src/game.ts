@@ -14,7 +14,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  scene: [MainScene],
+  scene: [MainScene, BossScene],
   render: { pixelArt: true, roundPixels: true },
   scale: {
     mode: Phaser.Scale.FIT,

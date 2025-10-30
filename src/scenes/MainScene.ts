@@ -14,6 +14,7 @@ import { preloadForestTiles } from "../helpers/environmentLoaders/preloadForestT
 import { createForestPlatforms } from "../environment/createForestPlatforms";
 import { preloadPlayerHealth } from "../helpers/uiLoaders/preloadPlayerHealth";
 import { setupPlayerHealth } from "../player/playerHealth";
+import { createTreeBranch } from "../environment/createTreeBranch";
 
 export default class MainScene extends Phaser.Scene {
   private backgroundLayers?: {
@@ -28,6 +29,11 @@ export default class MainScene extends Phaser.Scene {
   private ground!: Phaser.Physics.Arcade.StaticGroup;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
   private targetCamY: number = 0;
+
+  private levelEnd!: Phaser.GameObjects.Zone & {
+    body: Phaser.Physics.Arcade.Body;
+  };
+  private transitioning: boolean = false;
 
   constructor() {
     super("MainScene");
@@ -44,12 +50,86 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.backgroundLayers = createForestBackground(this);
 
+    const startTreeX = 0;
+    const startTreeY = 190;
+
+    const treeTrunk = this.physics.add.staticImage(
+      startTreeX,
+      startTreeY,
+      "tree"
+    );
+    treeTrunk.setScale(1);
+    treeTrunk.refreshBody();
+    treeTrunk.setSize(treeTrunk.width, treeTrunk.height);
+    treeTrunk.setOffset(0, 0);
+
+    const startBranch = createTreeBranch(
+      this,
+      [{ x: startTreeX + 90, y: startTreeY - 50 }],
+      "right"
+    );
+
+    const endTreeX = 5000;
+    const endtreeY = -230;
+
+    const endTreeTrunk = this.physics.add.staticImage(
+      endTreeX,
+      endtreeY,
+      "tree"
+    );
+    endTreeTrunk.setScale(1.5);
+
+    const endTreeBranches = createTreeBranch(this, [
+      { x: endTreeX - 75, y: 155 },
+      { x: endTreeX - 75, y: -5 },
+      { x: endTreeX - 75, y: -165 },
+      { x: endTreeX - 75, y: -325 },
+    ]);
+
+    const endTreeBranchesRight = createTreeBranch(
+      this,
+      [
+        { x: endTreeX + 90, y: 75 },
+        { x: endTreeX + 90, y: -85 },
+        { x: endTreeX + 90, y: -245 },
+        { x: endTreeX + 90, y: -405 },
+        { x: endTreeX + 190, y: -405 },
+        { x: endTreeX + 280, y: -405 },
+        { x: endTreeX + 380, y: -405 },
+      ],
+      "right"
+    );
+
     this.ground = createForestGroundSegments(this, [
-      { x: 0, width: 800 },
+      { x: -200, width: 1000 },
       { x: 1000, width: 600 },
       { x: 1900, width: 700 },
-      { x: 3400, width: 1000, y: 300 },
+      { x: 3400, width: 1700, y: 300 },
+      { x: 5500, width: 400, y: 200 },
     ]);
+
+    const holeX = 5600 + 105;
+    const holeY = 200 - 35;
+    const holeWidth = 400;
+    const holeHeight = 80;
+
+    const holeImage = this.add.image(holeX, holeY, "ground_hole");
+    holeImage.setDepth(3);
+    holeImage.setOrigin(0.5, 0.5);
+    holeImage.setScale(1);
+
+    this.levelEnd = this.add.zone(
+      holeX,
+      holeY,
+      holeWidth,
+      holeHeight
+    ) as Phaser.GameObjects.Zone & {
+      body: Phaser.Physics.Arcade.Body;
+    };
+
+    this.physics.add.existing(this.levelEnd);
+    this.levelEnd.body.setAllowGravity(false);
+    this.levelEnd.body.setImmovable(true);
 
     this.platforms = createForestPlatforms(this, [
       { x: 900, y: 375 },
@@ -65,7 +145,7 @@ export default class MainScene extends Phaser.Scene {
     createPlayerAnimations(this);
     createShadowEnemyAnimations(this);
 
-    this.player = this.physics.add.sprite(250, 400, "player_idle");
+    this.player = this.physics.add.sprite(4700, 200, "player_idle");
     this.player.body?.setSize(15, 15);
     this.player.setDepth(1);
 
@@ -94,6 +174,10 @@ export default class MainScene extends Phaser.Scene {
     });
 
     this.physics.add.collider(this.player, this.ground!);
+    this.physics.add.collider(this.player, treeTrunk);
+    this.physics.add.collider(this.player, startBranch);
+    this.physics.add.collider(this.player, endTreeBranches);
+    this.physics.add.collider(this.player, endTreeBranchesRight);
     this.physics.add.collider(this.player, this.platforms);
     this.physics.add.collider(this.enemies, this.ground!);
     this.physics.add.collider(this.enemies, this.platforms);
@@ -106,6 +190,10 @@ export default class MainScene extends Phaser.Scene {
     setupPlayerControls(this.player, this, this.enemies);
 
     this.player.play("idle");
+
+    this.physics.add.overlap(this.player, this.levelEnd, () => {
+      this.startTransition();
+    });
   }
 
   update() {
@@ -118,14 +206,45 @@ export default class MainScene extends Phaser.Scene {
       backgroundLayers.close.tilePositionX = cam.scrollX * 0.7;
     }
 
-    if (this.player.x >= 2300 && this.player.x <= 3600) {
+    if (
+      (this.player.x >= 0 && this.player.x <= 600) ||
+      (this.player.x >= 2300 && this.player.x <= 3600) ||
+      (this.player.x >= 4700 && this.player.x <= 6000)
+    ) {
       this.targetCamY = this.player.y - 375;
     } else {
       this.targetCamY = cam.scrollY;
     }
 
+    const playerVelocityY = this.player.body?.velocity.y ?? 0;
+    const isFallingFast = playerVelocityY > 150;
+    const lerpSpeed = isFallingFast ? 0.2 : 0.05;
+
     if (this.targetCamY !== undefined) {
-      cam.scrollY = Phaser.Math.Linear(cam.scrollY, this.targetCamY, 0.05);
+      cam.scrollY = Phaser.Math.Linear(cam.scrollY, this.targetCamY, lerpSpeed);
     }
+  }
+
+  private startTransition() {
+    if (this.transitioning) return;
+
+    this.transitioning = true;
+
+    this.player.setVelocity(0, 0);
+    this.player.body!.enable = false;
+
+    this.tweens.add({
+      targets: this.player,
+      y: this.player.y + 30,
+      alpha: 0,
+      duration: 1000,
+      ease: "Sine.easeIn",
+    });
+
+    this.cameras.main.fadeOut(1200, 0, 0, 0);
+
+    this.cameras.main.once("camerafadeoutcomplete", () => {
+      this.scene.start("BossScene");
+    });
   }
 }
