@@ -4,8 +4,8 @@ export function createCaveCeiling(
 ) {
   const group = scene.physics.add.staticGroup();
 
-  segments.forEach(({ x, width, y = 100 }) => {
-    const ceilingHeight = 27;
+  segments.forEach(({ x, width, y = -137 }) => {
+    const ceilingHeight = 500;
 
     const ceiling = scene.add.tileSprite(
       x,

@@ -145,7 +145,7 @@ export default class MainScene extends Phaser.Scene {
     createPlayerAnimations(this);
     createShadowEnemyAnimations(this);
 
-    this.player = this.physics.add.sprite(4700, 200, "player_idle");
+    this.player = this.physics.add.sprite(100, 100, "player_idle");
     this.player.body?.setSize(15, 15);
     this.player.setDepth(1);
 

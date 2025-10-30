@@ -25,6 +25,8 @@ export default class BossScene extends Phaser.Scene {
   private boss!: UndeadExecutioner;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
   private enemies!: Phaser.Physics.Arcade.Group;
+  private bossIntroComplete: boolean = false;
+  private hasLanded: boolean = false;
 
   public addEnemy(enemy: Phaser.Physics.Arcade.Sprite) {
     this.enemies.add(enemy);
@@ -35,7 +37,6 @@ export default class BossScene extends Phaser.Scene {
   }
 
   preload() {
-    console.log("bossscene preload started");
     preloadCaveBackground(this);
     preloadPlayerHealth(this);
     preloadPlayerSprites(this);
@@ -44,28 +45,25 @@ export default class BossScene extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.fadeIn(800, 0, 0, 0);
-    console.log("bossscene loaded");
-
     createCaveBackground(this);
-    this.ground = createCaveGroundSegments(this, [{ x: 180, width: 750 }]);
+    this.ground = createCaveGroundSegments(this, [{ x: -100, width: 5000 }]);
 
     createPlayerAnimations(this);
     createBossAnimations(this);
 
     const caveBounds = this.physics.add.staticGroup();
 
-    this.ceiling = createCaveCeiling(this, [{ x: 555, width: 750 }]);
+    this.ceiling = createCaveCeiling(this, [{ x: 555, width: 5000 }]);
 
     this.walls = createCaveWalls(this, [
       {
-        x: 190,
+        x: -280,
         y: 270,
         height: 370,
         side: "left",
       },
       {
-        x: 930,
+        x: 1400,
         y: 270,
         height: 370,
         side: "right",
@@ -83,10 +81,10 @@ export default class BossScene extends Phaser.Scene {
       { x: 730, y: 355 },
     ]);
 
-    this.player = this.physics.add.sprite(250, 200, "player_idle");
+    this.player = this.physics.add.sprite(250, 150, "player_idle");
     this.player.body?.setSize(15, 15);
     this.player.setCollideWorldBounds(true);
-    this.player.setData("isInvincible");
+    this.player.setData("isInvincible", true);
 
     this.enemies = this.physics.add.group({
       runChildUpdate: true,
@@ -95,19 +93,93 @@ export default class BossScene extends Phaser.Scene {
 
     this.boss = new UndeadExecutioner(this, 575, 275);
     this.boss.setPlayer(this.player);
-
     this.boss.body?.setSize(30, 70);
+
+    this.boss.setActive(false);
 
     this.enemies.add(this.boss);
 
+    this.setupIntroCamera();
+
+    this.setupCollisions(caveBounds);
+
+    this.physics.add.collider(this.player, this.ground, () => {
+      if (!this.hasLanded && this.player.body?.touching.down) {
+        this.hasLanded = true;
+        this.startBossIntro();
+      }
+    });
+
     this.physics.add.collider(this.player, this.platforms);
-    this.physics.add.collider(this.player, this.ground);
     this.physics.add.collider(this.player, this.walls);
     this.physics.add.collider(this.player, this.ceiling);
     this.physics.add.collider(this.player, caveBounds);
     this.physics.add.collider(this.boss, this.ground);
     this.physics.add.collider(this.boss, caveBounds);
 
+    setupPlayerHealth(this.player, this, 100);
+  }
+
+  private setupIntroCamera() {
+    const cam = this.cameras.main;
+    cam.fadeIn(1000, 0, 0, 0);
+
+    cam.setZoom(2.5);
+    cam.startFollow(this.player, true, 0.1, 0.1);
+  }
+
+  private startBossIntro() {
+    if (this.bossIntroComplete) return;
+
+    this.bossIntroComplete = true;
+
+    const cam = this.cameras.main;
+    const roomLeft = 200;
+    const roomRight = 800;
+    const roomTop = 0;
+    const roomBottom = 540;
+
+    this.tweens.add({
+      targets: cam,
+      zoom: 2,
+      scrollX: (roomLeft + roomRight) / 2 - cam.width / 4,
+      scrollY: (roomTop + roomBottom) / 2 - cam.height / 4,
+      duration: 2000,
+      ease: "Quad.easeInOut",
+      onUpdate: () => {
+        const progress = this.tweens.getTweensOf(cam)[0]?.progress || 0;
+        const centerX = (roomLeft + roomRight) / 2;
+        const centerY = (roomTop + roomBottom) / 2;
+
+        const currentX = Phaser.Math.Linear(this.player.x, centerX, progress);
+        const currentY = Phaser.Math.Linear(this.player.y, centerY, progress);
+
+        cam.centerOn(currentX, currentY);
+      },
+      onComplete: () => {
+        const roomWidth = roomRight - roomLeft;
+        const roomHeight = roomBottom - roomTop;
+        cam.setBounds(roomLeft, roomTop, roomWidth, roomHeight);
+        cam.stopFollow();
+        cam.centerOn((roomLeft + roomRight) / 2, (roomTop + roomBottom) / 2);
+        cam.fadeIn(500, 0, 0, 0);
+
+        this.time.delayedCall(1000, () => {
+          this.activateBoss();
+        });
+      },
+    });
+  }
+
+  private activateBoss() {
+    this.boss.setActive(true);
+
+    this.player.setData("isInvincible", false);
+
+    setupPlayerControls(this.player, this, this.enemies);
+  }
+
+  private setupCollisions(caveBounds: Phaser.Physics.Arcade.StaticGroup) {
     this.physics.add.collider(
       this.boss.projectileGroup,
       this.platforms,
@@ -140,36 +212,11 @@ export default class BossScene extends Phaser.Scene {
         player.emit("takeDamage", 1, projectile.x);
       }
     );
-
-    setupPlayerControls(this.player, this, this.enemies);
-    setupPlayerHealth(this.player, this, 100);
-
-    this.setupCamera();
   }
 
   update() {
-    if (this.boss) {
+    if (this.boss && this.bossIntroComplete) {
       this.boss.update();
     }
-  }
-
-  private setupCamera() {
-    const cam = this.cameras.main;
-
-    const roomLeft = 200;
-    const roomRight = 800;
-    const roomTop = 0;
-    const roomBottom = 540;
-
-    const roomWidth = roomRight - roomLeft;
-    const roomHeight = roomBottom - roomTop;
-
-    cam.setBounds(roomLeft, roomTop, roomWidth, roomHeight);
-
-    cam.setZoom(2);
-
-    cam.centerOn((roomLeft + roomRight) / 2, (roomTop + roomBottom) / 2);
-
-    cam.stopFollow();
   }
 }
