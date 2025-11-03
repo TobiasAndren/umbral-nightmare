@@ -3,9 +3,9 @@ import MainScene from "./scenes/MainScene";
 import BossScene from "./scenes/BossScene";
 
 const config: Phaser.Types.Core.GameConfig = {
-  type: Phaser.CANVAS,
+  type: Phaser.WEBGL,
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.ENVELOP,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: 1440,
     height: 684,
