@@ -65,7 +65,7 @@ export default class MainScene extends Phaser.Scene {
 
     const startBranch = createTreeBranch(
       this,
-      [{ x: startTreeX + 90, y: startTreeY - 50 }],
+      [{ x: startTreeX + 90, y: startTreeY }],
       "right"
     );
 
@@ -145,7 +145,7 @@ export default class MainScene extends Phaser.Scene {
     createPlayerAnimations(this);
     createShadowEnemyAnimations(this);
 
-    this.player = this.physics.add.sprite(100, 100, "player_idle");
+    this.player = this.physics.add.sprite(100, 150, "player_idle");
     this.player.body?.setSize(15, 15);
     this.player.setDepth(1);
 
@@ -207,7 +207,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     if (
-      (this.player.x >= 0 && this.player.x <= 600) ||
+      (this.player.x >= 0 && this.player.x <= 450) ||
       (this.player.x >= 2300 && this.player.x <= 3600) ||
       (this.player.x >= 4700 && this.player.x <= 6000)
     ) {

@@ -7,7 +7,7 @@ export function handleMovement(
   isAttacking: boolean,
   isKnockedBack: boolean
 ) {
-  if (isKnockedBack || player.getData("isDead")) {
+  if (isKnockedBack) {
     return false;
   }
 

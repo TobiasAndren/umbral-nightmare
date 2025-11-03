@@ -12,7 +12,7 @@ export function setupPlayerControls(
   const attack = setupPlayerAttack(player, scene, enemies);
 
   scene.events.on("update", () => {
-    if (!player.body) return;
+    if (!player.body || player.getData("isDead")) return;
 
     const isKnockedBack = player.getData("isKnockedBack");
 
