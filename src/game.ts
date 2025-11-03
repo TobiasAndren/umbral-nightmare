@@ -4,22 +4,24 @@ import BossScene from "./scenes/BossScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 1440,
-  height: 684,
+  scale: {
+    mode: Phaser.Scale.ENVELOP,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 1440,
+    height: 684,
+  },
   backgroundColor: "#16303c",
   physics: {
     default: "arcade",
     arcade: {
       gravity: { y: 500, x: 0 },
+      fps: 60,
+      timeScale: 1,
       debug: false,
     },
   },
   scene: [MainScene, BossScene],
   render: { pixelArt: true, roundPixels: true },
-  scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-  },
 };
 
 export default new Phaser.Game(config);
