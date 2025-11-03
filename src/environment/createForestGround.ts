@@ -31,6 +31,8 @@ export function createForestGroundSegments(
     body.updateFromGameObject();
 
     group.add(ground);
+    group.add(leftEdge);
+    group.add(rightEdge);
   });
 
   return group;
