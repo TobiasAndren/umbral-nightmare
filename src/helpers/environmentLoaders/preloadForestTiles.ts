@@ -17,4 +17,7 @@ export function preloadForestTiles(scene: Phaser.Scene) {
     "forest_ground_edge_right",
     "assets/environment/forest/ground-edge-right.png"
   );
+  scene.load.image("tree", "assets/environment/forest/tree.png");
+  scene.load.image("tree_branch", "assets/environment/forest/tree-branch.png");
+  scene.load.image("ground_hole", "assets/environment/forest/ground-hole.png");
 }

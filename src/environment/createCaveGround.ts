@@ -12,8 +12,8 @@ export function createCaveGroundSegments(
 ) {
   const group = scene.physics.add.staticGroup();
 
-  segments.forEach(({ x, width, y = 440 }) => {
-    const groundHeight = 27;
+  segments.forEach(({ x, width, y = 675 }) => {
+    const groundHeight = 500;
 
     const ground = scene.add
       .tileSprite(x, y, width, groundHeight, "cave_ground_tile")

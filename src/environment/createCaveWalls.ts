@@ -11,7 +11,7 @@ export function createCaveWalls(scene: Phaser.Scene, segments: WallSegment[]) {
   const group = scene.physics.add.staticGroup();
 
   segments.forEach(({ x, height, y = 270, side = "left" }) => {
-    const wallWidth = 27;
+    const wallWidth = 500;
 
     const wall = scene.add
       .tileSprite(x, y, wallWidth, height, "cave_wall_tile")

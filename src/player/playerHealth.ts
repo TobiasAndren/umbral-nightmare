@@ -83,6 +83,7 @@ export function setupPlayerHealth(
   });
 
   function handlePlayerDeath() {
+    player.setData("isDead", true);
     player.anims.play("death");
     player.setVelocity(0);
     player.body!.enable = false;
