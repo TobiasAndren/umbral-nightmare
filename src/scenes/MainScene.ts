@@ -28,7 +28,6 @@ export default class MainScene extends Phaser.Scene {
   private enemies!: Phaser.Physics.Arcade.Group;
   private ground!: Phaser.Physics.Arcade.StaticGroup;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
-  private targetCamY: number = 0;
 
   private levelEnd!: Phaser.GameObjects.Zone & {
     body: Phaser.Physics.Arcade.Body;
@@ -183,8 +182,9 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.enemies, this.platforms);
     this.physics.add.collider(this.player, this.enemies);
 
-    this.cameras.main.setZoom(2.5);
-    this.cameras.main.startFollow(this.player, true, 0.1, 0, -50, 50);
+    this.cameras.main.setZoom(2.25);
+    this.cameras.main.startFollow(this.player, true, 1, 1, -50, 0);
+    this.cameras.main.setDeadzone(0, 100);
 
     setupPlayerHealth(this.player, this, 5);
     setupPlayerControls(this.player, this, this.enemies);
@@ -197,31 +197,14 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
-    const backgroundLayers = this.backgroundLayers;
     const cam = this.cameras.main;
 
-    if (backgroundLayers) {
-      backgroundLayers.far.tilePositionX = cam.scrollX * 0.2;
-      backgroundLayers.mid.tilePositionX = cam.scrollX * 0.4;
-      backgroundLayers.close.tilePositionX = cam.scrollX * 0.7;
-    }
+    if (this.backgroundLayers) {
+      const { far, mid, close } = this.backgroundLayers;
 
-    if (
-      (this.player.x >= 0 && this.player.x <= 450) ||
-      (this.player.x >= 2300 && this.player.x <= 3600) ||
-      (this.player.x >= 4700 && this.player.x <= 6000)
-    ) {
-      this.targetCamY = this.player.y - 375;
-    } else {
-      this.targetCamY = cam.scrollY;
-    }
-
-    const playerVelocityY = this.player.body?.velocity.y ?? 0;
-    const isFallingFast = playerVelocityY > 150;
-    const lerpSpeed = isFallingFast ? 0.2 : 0.05;
-
-    if (this.targetCamY !== undefined) {
-      cam.scrollY = Phaser.Math.Linear(cam.scrollY, this.targetCamY, lerpSpeed);
+      far.tilePositionX = cam.scrollX * 0.2;
+      mid.tilePositionX = cam.scrollX * 0.4;
+      close.tilePositionX = cam.scrollX * 0.7;
     }
   }
 

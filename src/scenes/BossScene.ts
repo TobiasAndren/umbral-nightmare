@@ -125,7 +125,7 @@ export default class BossScene extends Phaser.Scene {
     cam.fadeIn(1000, 0, 0, 0);
 
     cam.setZoom(2.5);
-    cam.startFollow(this.player, true, 0.1, 0.1);
+    cam.startFollow(this.player, true, 1, 1);
   }
 
   private startBossIntro() {
