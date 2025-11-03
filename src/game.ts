@@ -3,7 +3,7 @@ import MainScene from "./scenes/MainScene";
 import BossScene from "./scenes/BossScene";
 
 const config: Phaser.Types.Core.GameConfig = {
-  type: Phaser.AUTO,
+  type: Phaser.CANVAS,
   scale: {
     mode: Phaser.Scale.ENVELOP,
     autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -11,6 +11,10 @@ const config: Phaser.Types.Core.GameConfig = {
     height: 684,
   },
   backgroundColor: "#16303c",
+  fps: {
+    target: 60,
+    forceSetTimeOut: true,
+  },
   physics: {
     default: "arcade",
     arcade: {
@@ -21,7 +25,12 @@ const config: Phaser.Types.Core.GameConfig = {
     },
   },
   scene: [MainScene, BossScene],
-  render: { pixelArt: true, roundPixels: true },
+  render: {
+    pixelArt: true,
+    roundPixels: true,
+    antialias: false,
+    powerPreference: "low-power",
+  },
 };
 
 export default new Phaser.Game(config);
