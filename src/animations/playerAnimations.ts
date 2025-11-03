@@ -15,7 +15,7 @@ export function createPlayerAnimations(scene: Phaser.Scene) {
       sheet: "player_run",
       start: 0,
       end: 7,
-      frameRate: 15,
+      frameRate: 12,
       repeat: -1,
     },
     {
