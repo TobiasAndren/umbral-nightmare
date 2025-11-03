@@ -1,40 +1,42 @@
 import Phaser from "phaser";
+import { setupPlayerInput } from "./playerInput";
+import { handleMovement } from "./playerMovement";
+import { setupPlayerAttack } from "./playerAttack";
 
 export function setupPlayerControls(
   player: Phaser.Physics.Arcade.Sprite,
-  scene: Phaser.Scene
+  scene: Phaser.Scene,
+  enemies?: Phaser.Physics.Arcade.Group
 ) {
-  const cursors = scene.input.keyboard?.createCursorKeys();
-  const keys = scene.input.keyboard?.addKeys({
-    W: Phaser.Input.Keyboard.KeyCodes.W,
-    A: Phaser.Input.Keyboard.KeyCodes.A,
-    S: Phaser.Input.Keyboard.KeyCodes.S,
-    D: Phaser.Input.Keyboard.KeyCodes.D,
-  }) as { [key: string]: Phaser.Input.Keyboard.Key };
+  const { cursors, keys } = setupPlayerInput(scene);
+  const attack = setupPlayerAttack(player, scene, enemies);
 
   scene.events.on("update", () => {
-    if (!player.body) return;
+    if (!player.body || player.getData("isDead")) return;
 
-    if (cursors?.left?.isDown || keys.A.isDown) {
-      player.setVelocityX(-200);
-      player.anims.play("run", true);
-      player.setFlipX(true);
-    } else if (cursors?.right?.isDown || keys.D.isDown) {
-      player.setVelocityX(200);
-      player.anims.play("run", true);
-      player.setFlipX(false);
-    } else {
-      player.setVelocityX(0);
-      player.anims.play("idle", true);
+    const isKnockedBack = player.getData("isKnockedBack");
+
+    if (Phaser.Input.Keyboard.JustDown(cursors.space || keys.SPACE)) {
+      attack.queueAttack();
     }
 
-    if ((cursors?.up?.isDown || keys.W.isDown) && player.body.blocked.down) {
-      player.setVelocityY(-400);
-      player.anims.play("jump", true);
+    handleMovement(
+      player,
+      cursors,
+      keys,
+      attack.state.isAttacking,
+      isKnockedBack
+    );
+
+    if (attack.state.isAttacking) {
+      if (!player.anims.isPlaying || player.anims.getName() !== "attack") {
+        player.anims.play("attack", true);
+      }
     }
 
-    if (!player.body.blocked.down && player.body.velocity.y > 0) {
-      player.anims.play("fall", true);
+    if (!attack.state.isAttacking) {
+      attack.attackHitBox.x = player.flipX ? player.x - 20 : player.x + 20;
+      attack.attackHitBox.y = player.y;
     }
   });
 }

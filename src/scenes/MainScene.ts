@@ -1,70 +1,250 @@
 import Phaser from "phaser";
-import { createPlayerAnimations } from "../player/playerAnimations";
 import { setupPlayerControls } from "../player/playerController";
-import { createPlatforms } from "../environment/platform";
+import { createForestGroundSegments } from "../environment/createForestGround";
+import { preloadPlayerSprites } from "../helpers/spriteLoaders/preloadPlayerAssets";
+import { createPlayerAnimations } from "../animations/playerAnimations";
+import { preloadShadowEnemySprites } from "../helpers/spriteLoaders/preloadShadowEnemyAssets";
+import { createShadowEnemyAnimations } from "../animations/shadowEnemyAnimations";
+import ShadowEnemy from "../enemies/ShadowEnemy";
+import {
+  createForestBackground,
+  preloadForestBackground,
+} from "../helpers/backgroundLoaders/preloadForestBackground";
+import { preloadForestTiles } from "../helpers/environmentLoaders/preloadForestTiles";
+import { createForestPlatforms } from "../environment/createForestPlatforms";
+import { preloadPlayerHealth } from "../helpers/uiLoaders/preloadPlayerHealth";
+import { setupPlayerHealth } from "../player/playerHealth";
+import { createTreeBranch } from "../environment/createTreeBranch";
 
 export default class MainScene extends Phaser.Scene {
+  private backgroundLayers?: {
+    bg: Phaser.GameObjects.TileSprite;
+    far: Phaser.GameObjects.TileSprite;
+    mid: Phaser.GameObjects.TileSprite;
+    close: Phaser.GameObjects.TileSprite;
+  };
+
+  private player!: Phaser.Physics.Arcade.Sprite;
+  private enemies!: Phaser.Physics.Arcade.Group;
+  private ground!: Phaser.Physics.Arcade.StaticGroup;
+  private platforms!: Phaser.Physics.Arcade.StaticGroup;
+  private targetCamY: number = 0;
+
+  private levelEnd!: Phaser.GameObjects.Zone & {
+    body: Phaser.Physics.Arcade.Body;
+  };
+  private transitioning: boolean = false;
+
   constructor() {
     super("MainScene");
   }
 
   preload() {
-    const spriteConfigs = [
-      {
-        key: "player_idle",
-        file: "Idle.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-      {
-        key: "player_run",
-        file: "Run.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-      {
-        key: "player_attack",
-        file: "Attack-1.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-      {
-        key: "player_jump",
-        file: "Jump.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-      {
-        key: "player_fall",
-        file: "Fall.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-      {
-        key: "player_hurt",
-        file: "Hurt.png",
-        frames: { frameWidth: 144, frameHeight: 144 },
-      },
-    ];
-
-    spriteConfigs.forEach((config) =>
-      this.load.spritesheet(
-        config.key,
-        `assets/player/${config.file}`,
-        config.frames
-      )
-    );
+    preloadForestBackground(this);
+    preloadPlayerSprites(this);
+    preloadShadowEnemySprites(this);
+    preloadForestTiles(this);
+    preloadPlayerHealth(this);
   }
 
   create() {
-    const player = this.physics.add.sprite(100, 400, "player_idle");
+    this.backgroundLayers = createForestBackground(this);
 
-    player.body.setSize(15, 15);
+    const startTreeX = 0;
+    const startTreeY = 190;
+
+    const treeTrunk = this.physics.add.staticImage(
+      startTreeX,
+      startTreeY,
+      "tree"
+    );
+    treeTrunk.setScale(1);
+    treeTrunk.refreshBody();
+    treeTrunk.setSize(treeTrunk.width, treeTrunk.height);
+    treeTrunk.setOffset(0, 0);
+
+    const startBranch = createTreeBranch(
+      this,
+      [{ x: startTreeX + 90, y: startTreeY }],
+      "right"
+    );
+
+    const endTreeX = 5000;
+    const endtreeY = -230;
+
+    const endTreeTrunk = this.physics.add.staticImage(
+      endTreeX,
+      endtreeY,
+      "tree"
+    );
+    endTreeTrunk.setScale(1.5);
+
+    const endTreeBranches = createTreeBranch(this, [
+      { x: endTreeX - 75, y: 155 },
+      { x: endTreeX - 75, y: -5 },
+      { x: endTreeX - 75, y: -165 },
+      { x: endTreeX - 75, y: -325 },
+    ]);
+
+    const endTreeBranchesRight = createTreeBranch(
+      this,
+      [
+        { x: endTreeX + 90, y: 75 },
+        { x: endTreeX + 90, y: -85 },
+        { x: endTreeX + 90, y: -245 },
+        { x: endTreeX + 90, y: -405 },
+        { x: endTreeX + 190, y: -405 },
+        { x: endTreeX + 280, y: -405 },
+        { x: endTreeX + 380, y: -405 },
+      ],
+      "right"
+    );
+
+    this.ground = createForestGroundSegments(this, [
+      { x: -200, width: 1000 },
+      { x: 1000, width: 600 },
+      { x: 1900, width: 700 },
+      { x: 3400, width: 1700, y: 300 },
+      { x: 5500, width: 400, y: 200 },
+    ]);
+
+    const holeX = 5600 + 105;
+    const holeY = 200 - 35;
+    const holeWidth = 400;
+    const holeHeight = 80;
+
+    const holeImage = this.add.image(holeX, holeY, "ground_hole");
+    holeImage.setDepth(3);
+    holeImage.setOrigin(0.5, 0.5);
+    holeImage.setScale(1);
+
+    this.levelEnd = this.add.zone(
+      holeX,
+      holeY,
+      holeWidth,
+      holeHeight
+    ) as Phaser.GameObjects.Zone & {
+      body: Phaser.Physics.Arcade.Body;
+    };
+
+    this.physics.add.existing(this.levelEnd);
+    this.levelEnd.body.setAllowGravity(false);
+    this.levelEnd.body.setImmovable(true);
+
+    this.platforms = createForestPlatforms(this, [
+      { x: 900, y: 375 },
+      { x: 1700, y: 365 },
+      { x: 1800, y: 390 },
+      { x: 2700, y: 375 },
+      { x: 2850, y: 345 },
+      { x: 3000, y: 315 },
+      { x: 3150, y: 285 },
+      { x: 3300, y: 255 },
+    ]);
 
     createPlayerAnimations(this);
-    const platforms = createPlatforms(this);
-    this.physics.add.collider(player, platforms);
+    createShadowEnemyAnimations(this);
 
-    this.cameras.main.setZoom(2);
-    this.cameras.main.startFollow(player, true, 0.05, 0.05);
+    this.player = this.physics.add.sprite(100, 150, "player_idle");
+    this.player.body?.setSize(15, 15);
+    this.player.setDepth(1);
 
-    setupPlayerControls(player, this);
+    this.player.setTint(0xffffff);
 
-    player.play("idle");
+    this.enemies = this.physics.add.group({
+      runChildUpdate: true,
+    });
+
+    const enemyPositions = [
+      { x: 600, y: 400 },
+      { x: 700, y: 400 },
+      { x: 1200, y: 400 },
+      { x: 1500, y: 380 },
+      { x: 2000, y: 400 },
+      { x: 3800, y: 200 },
+      { x: 4000, y: 200 },
+    ];
+
+    enemyPositions.forEach((pos) => {
+      const enemy = new ShadowEnemy(this, pos.x, pos.y);
+      enemy.setPlayer(this.player);
+      enemy.body?.setSize(15, 20);
+      enemy.body?.setOffset(25, 20);
+      this.enemies.add(enemy);
+    });
+
+    this.physics.add.collider(this.player, this.ground!);
+    this.physics.add.collider(this.player, treeTrunk);
+    this.physics.add.collider(this.player, startBranch);
+    this.physics.add.collider(this.player, endTreeBranches);
+    this.physics.add.collider(this.player, endTreeBranchesRight);
+    this.physics.add.collider(this.player, this.platforms);
+    this.physics.add.collider(this.enemies, this.ground!);
+    this.physics.add.collider(this.enemies, this.platforms);
+    this.physics.add.collider(this.player, this.enemies);
+
+    this.cameras.main.setZoom(2.5);
+    this.cameras.main.startFollow(this.player, true, 0.2, 0, -50, 30);
+
+    setupPlayerHealth(this.player, this, 5);
+    setupPlayerControls(this.player, this, this.enemies);
+
+    this.player.play("idle");
+
+    this.physics.add.overlap(this.player, this.levelEnd, () => {
+      this.startTransition();
+    });
+  }
+
+  update() {
+    const backgroundLayers = this.backgroundLayers;
+    const cam = this.cameras.main;
+
+    if (backgroundLayers) {
+      backgroundLayers.far.tilePositionX = cam.scrollX * 0.2;
+      backgroundLayers.mid.tilePositionX = cam.scrollX * 0.4;
+      backgroundLayers.close.tilePositionX = cam.scrollX * 0.7;
+    }
+
+    if (
+      (this.player.x >= 0 && this.player.x <= 450) ||
+      (this.player.x >= 2300 && this.player.x <= 3600) ||
+      (this.player.x >= 4700 && this.player.x <= 6000)
+    ) {
+      this.targetCamY = this.player.y - 375;
+    } else {
+      this.targetCamY = cam.scrollY;
+    }
+
+    const playerVelocityY = this.player.body?.velocity.y ?? 0;
+    const isFallingFast = playerVelocityY > 150;
+    const lerpSpeed = isFallingFast ? 0.2 : 0.05;
+
+    if (this.targetCamY !== undefined) {
+      cam.scrollY = Phaser.Math.Linear(cam.scrollY, this.targetCamY, lerpSpeed);
+    }
+  }
+
+  private startTransition() {
+    if (this.transitioning) return;
+
+    this.transitioning = true;
+
+    this.player.setVelocity(0, 0);
+    this.player.body!.enable = false;
+
+    this.tweens.add({
+      targets: this.player,
+      y: this.player.y + 30,
+      alpha: 0,
+      duration: 1000,
+      ease: "Sine.easeIn",
+    });
+
+    this.cameras.main.fadeOut(1200, 0, 0, 0);
+
+    this.cameras.main.once("camerafadeoutcomplete", () => {
+      this.scene.start("BossScene");
+    });
   }
 }

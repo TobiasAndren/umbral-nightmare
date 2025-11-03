@@ -1,19 +1,20 @@
 import Phaser from "phaser";
 import MainScene from "./scenes/MainScene";
+import BossScene from "./scenes/BossScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: window.innerWidth,
   height: window.innerHeight,
-  backgroundColor: "#1d1d1d",
+  backgroundColor: "#16303c",
   physics: {
     default: "arcade",
     arcade: {
       gravity: { y: 500, x: 0 },
-      debug: true,
+      debug: false,
     },
   },
-  scene: [MainScene],
+  scene: [MainScene, BossScene],
   render: { pixelArt: true, roundPixels: true },
   scale: {
     mode: Phaser.Scale.FIT,
