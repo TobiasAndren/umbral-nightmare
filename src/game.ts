@@ -5,7 +5,7 @@ import BossScene from "./scenes/BossScene";
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.CANVAS,
   scale: {
-    mode: Phaser.Scale.ENVELOP,
+    mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: 1440,
     height: 684,
