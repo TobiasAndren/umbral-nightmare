@@ -23,7 +23,9 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: [MainScene, BossScene],
   render: {
     pixelArt: true,
-    roundPixels: true,
+    roundPixels: false,
+    antialias: false,
+    powerPreference: "high-performance",
   },
 };
 

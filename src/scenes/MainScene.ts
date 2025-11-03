@@ -184,7 +184,7 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.enemies);
 
     this.cameras.main.setZoom(2.5);
-    this.cameras.main.startFollow(this.player, true, 0.2, 0, -50, 30);
+    this.cameras.main.startFollow(this.player, true, 0.1, 0.1, -50, 30);
 
     setupPlayerHealth(this.player, this, 5);
     setupPlayerControls(this.player, this, this.enemies);
