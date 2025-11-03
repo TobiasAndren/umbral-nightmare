@@ -4,8 +4,8 @@ import BossScene from "./scenes/BossScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: window.innerWidth,
-  height: window.innerHeight,
+  width: 1440,
+  height: 684,
   backgroundColor: "#16303c",
   physics: {
     default: "arcade",
