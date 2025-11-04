@@ -47,7 +47,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
-    this.backgroundLayers = createForestBackground(this);
+    this.backgroundLayers = createForestBackground(this, true);
 
     const startTreeX = 0;
     const startTreeY = 190;

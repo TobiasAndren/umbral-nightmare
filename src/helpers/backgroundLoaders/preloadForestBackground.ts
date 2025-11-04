@@ -19,7 +19,10 @@ export function preloadForestBackground(scene: Phaser.Scene) {
   );
 }
 
-export function createForestBackground(scene: Phaser.Scene) {
+export function createForestBackground(
+  scene: Phaser.Scene,
+  withOverlay: boolean
+) {
   const width = scene.scale.width;
   const height = scene.scale.height;
 
@@ -65,11 +68,15 @@ export function createForestBackground(scene: Phaser.Scene) {
     .setScrollFactor(0, 0)
     .setDepth(0);
 
-  const overlay = scene.add
-    .rectangle(0, 0, width, height, 0xffffff, 0.1)
-    .setOrigin(0)
-    .setScrollFactor(0)
-    .setDepth(0);
+  let overlay = null;
+
+  if (withOverlay) {
+    overlay = scene.add
+      .rectangle(0, 0, width, height, 0xffffff, 0.1)
+      .setOrigin(0)
+      .setScrollFactor(0)
+      .setDepth(0);
+  }
 
   return { bg, far, mid, close, overlay };
 }
