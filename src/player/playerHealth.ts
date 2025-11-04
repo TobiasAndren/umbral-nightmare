@@ -3,12 +3,14 @@ import Phaser from "phaser";
 export function setupPlayerHealth(
   player: Phaser.Physics.Arcade.Sprite,
   scene: Phaser.Scene,
-  maxHealth: number = 5
+  maxHealth: number = 5,
+  heartPosX: number = 410,
+  heartPosY: number = 195
 ) {
   const hearts: Phaser.GameObjects.Image[] = [];
   for (let i = 0; i < maxHealth; i++) {
     const heart = scene.add
-      .image(440 + i * 24, 210, "full_heart")
+      .image(heartPosX + i * 24, heartPosY, "full_heart")
       .setOrigin(0, 0)
       .setScrollFactor(0)
       .setScale(0.02);

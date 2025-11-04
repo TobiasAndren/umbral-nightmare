@@ -117,7 +117,7 @@ export default class BossScene extends Phaser.Scene {
     this.physics.add.collider(this.boss, this.ground);
     this.physics.add.collider(this.boss, caveBounds);
 
-    setupPlayerHealth(this.player, this, 100);
+    setupPlayerHealth(this.player, this, 5, 375, 185);
 
     this.boss.deathCallback = () => {
       this.time.delayedCall(1000, () => {
