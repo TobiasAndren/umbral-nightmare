@@ -9,6 +9,8 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
 
   public state: "idle" | "attacking" | "dead" = "idle";
 
+  public deathCallback?: () => void;
+
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
     super(scene, x, y, texture);
 
@@ -57,13 +59,19 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
 
     if (this.scene.anims.exists("boss_death")) {
       this.play("boss_death");
-
       if (this.body) this.body.enable = false;
 
-      this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-        this.destroy();
-      });
+      this.once(
+        Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "boss_death",
+        () => {
+          if (this.deathCallback) {
+            this.deathCallback();
+          }
+          this.destroy();
+        }
+      );
     } else {
+      if (this.deathCallback) this.deathCallback();
       this.destroy();
     }
   }

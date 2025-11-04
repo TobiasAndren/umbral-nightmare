@@ -118,6 +118,12 @@ export default class BossScene extends Phaser.Scene {
     this.physics.add.collider(this.boss, caveBounds);
 
     setupPlayerHealth(this.player, this, 5);
+
+    this.boss.deathCallback = () => {
+      this.time.delayedCall(1000, () => {
+        this.scene.start("WinMenuScene");
+      });
+    };
   }
 
   private setupIntroCamera() {
@@ -125,7 +131,7 @@ export default class BossScene extends Phaser.Scene {
     cam.fadeIn(1000, 0, 0, 0);
 
     cam.setZoom(2.5);
-    cam.startFollow(this.player, true, 1, 1);
+    cam.startFollow(this.player, true, 0.1, 0.1);
   }
 
   private startBossIntro() {
