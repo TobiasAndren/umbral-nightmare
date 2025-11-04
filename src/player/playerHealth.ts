@@ -92,7 +92,7 @@ export function setupPlayerHealth(
       Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "death",
       () => {
         scene.time.delayedCall(1000, () => {
-          scene.scene.restart();
+          scene.scene.start("DeathMenuScene");
         });
       }
     );

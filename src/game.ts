@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import MainScene from "./scenes/MainScene";
 import BossScene from "./scenes/BossScene";
 import { StartMenuScene } from "./scenes/StartMenuScene";
+import { DeathMenuScene } from "./scenes/DeathMenuScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -21,7 +22,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  scene: [StartMenuScene, MainScene, BossScene],
+  scene: [StartMenuScene, MainScene, BossScene, DeathMenuScene],
   render: {
     pixelArt: true,
     roundPixels: true,

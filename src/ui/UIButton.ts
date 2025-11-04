@@ -6,6 +6,8 @@ interface ButtonConfig {
   text: string;
   scene: Phaser.Scene;
   onClick: () => void;
+  width?: number;
+  height?: number;
 }
 
 export class UIButton {
@@ -13,7 +15,7 @@ export class UIButton {
   private bg: Phaser.GameObjects.Rectangle;
   private text: Phaser.GameObjects.Text;
 
-  constructor({ x, y, text, scene, onClick }: ButtonConfig) {
+  constructor({ x, y, text, scene, onClick, width, height }: ButtonConfig) {
     this.scene = scene;
 
     this.text = scene.add
@@ -26,8 +28,8 @@ export class UIButton {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
-    const bgWidth = this.text.width + 5;
-    const bgHeight = this.text.height + 5;
+    const bgWidth = width ?? this.text.width + 5;
+    const bgHeight = height ?? this.text.height + 5;
 
     this.bg = scene.add
       .rectangle(
