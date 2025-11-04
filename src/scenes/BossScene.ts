@@ -71,14 +71,14 @@ export default class BossScene extends Phaser.Scene {
     ]);
 
     this.platforms = createCavePlatforms(this, [
-      { x: 400, y: 355 },
-      { x: 300, y: 275 },
-      { x: 400, y: 195 },
+      { x: 385, y: 355 },
+      { x: 385, y: 200 },
       { x: 495, y: 275 },
-      { x: 730, y: 195 },
-      { x: 830, y: 275 },
+      { x: 565, y: 355 },
+      { x: 565, y: 195 },
       { x: 635, y: 275 },
-      { x: 730, y: 355 },
+      { x: 735, y: 195 },
+      { x: 735, y: 355 },
     ]);
 
     this.player = this.physics.add.sprite(250, 150, "player_idle");
@@ -117,7 +117,7 @@ export default class BossScene extends Phaser.Scene {
     this.physics.add.collider(this.boss, this.ground);
     this.physics.add.collider(this.boss, caveBounds);
 
-    setupPlayerHealth(this.player, this, 5);
+    setupPlayerHealth(this.player, this, 100);
 
     this.boss.deathCallback = () => {
       this.time.delayedCall(1000, () => {
