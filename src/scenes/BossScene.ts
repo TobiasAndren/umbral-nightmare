@@ -18,13 +18,17 @@ import {
 } from "../helpers/backgroundLoaders/preloadCaveBackground";
 
 export default class BossScene extends Phaser.Scene {
+  private ambience?: Phaser.Sound.BaseSound;
+
   private ground!: Phaser.Physics.Arcade.StaticGroup;
   private walls!: Phaser.Physics.Arcade.StaticGroup;
   private ceiling!: Phaser.Physics.Arcade.StaticGroup;
+  private platforms!: Phaser.Physics.Arcade.StaticGroup;
+
   private player!: Phaser.Physics.Arcade.Sprite;
   private boss!: UndeadExecutioner;
-  private platforms!: Phaser.Physics.Arcade.StaticGroup;
   private enemies!: Phaser.Physics.Arcade.Group;
+
   private bossIntroComplete: boolean = false;
   private hasLanded: boolean = false;
 
@@ -37,6 +41,7 @@ export default class BossScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.audio("cave_ambience", "assets/audio/ambience/cave-ambience.wav");
     preloadCaveBackground(this);
     preloadPlayerHealth(this);
     preloadPlayerSprites(this);
@@ -45,6 +50,12 @@ export default class BossScene extends Phaser.Scene {
   }
 
   create() {
+    this.ambience = this.sound.add("cave_ambience", {
+      loop: true,
+      volume: 0.4,
+    });
+
+    this.ambience.play();
     createCaveBackground(this);
     this.ground = createCaveGroundSegments(this, [{ x: -100, width: 5000 }]);
 
@@ -121,6 +132,18 @@ export default class BossScene extends Phaser.Scene {
 
     this.boss.deathCallback = () => {
       this.time.delayedCall(1000, () => {
+        if (this.ambience) {
+          this.tweens.add({
+            targets: this.ambience,
+            volume: 0,
+            duration: 1000,
+            ease: "Sine.easeOut",
+            onComplete: () => {
+              this.ambience?.stop();
+            },
+          });
+        }
+
         this.scene.start("WinMenuScene");
       });
     };

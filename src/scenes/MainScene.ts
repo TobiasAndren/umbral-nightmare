@@ -24,6 +24,8 @@ export default class MainScene extends Phaser.Scene {
     close: Phaser.GameObjects.TileSprite;
   };
 
+  private ambience?: Phaser.Sound.BaseSound;
+
   private player!: Phaser.Physics.Arcade.Sprite;
   private enemies!: Phaser.Physics.Arcade.Group;
   private ground!: Phaser.Physics.Arcade.StaticGroup;
@@ -39,6 +41,10 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.audio(
+      "forest_ambience",
+      "assets/audio/ambience/forest-ambience.wav"
+    );
     preloadForestBackground(this);
     preloadPlayerSprites(this);
     preloadShadowEnemySprites(this);
@@ -47,6 +53,12 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
+    this.ambience = this.sound.add("forest_ambience", {
+      loop: true,
+      volume: 0.4,
+    });
+
+    this.ambience.play();
     this.backgroundLayers = createForestBackground(this, true);
 
     const startTreeX = 0;
@@ -215,6 +227,18 @@ export default class MainScene extends Phaser.Scene {
 
     this.player.setVelocity(0, 0);
     this.player.body!.enable = false;
+
+    if (this.ambience) {
+      this.tweens.add({
+        targets: this.ambience,
+        volume: 0,
+        duration: 1000,
+        ease: "Sine.easeOut",
+        onComplete: () => {
+          this.ambience?.stop();
+        },
+      });
+    }
 
     this.tweens.add({
       targets: this.player,
