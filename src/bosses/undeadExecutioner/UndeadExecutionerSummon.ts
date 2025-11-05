@@ -12,7 +12,9 @@ export default class Demon extends Phaser.Physics.Arcade.Sprite {
     this.currentHealth -= amount;
     this.isHurt = true;
 
+    this.scene.sound.play("summon_hurt_audio", { volume: 0.1 });
     this.setTint(0xff0000);
+
     this.scene.time.delayedCall(100, () => {
       this.clearTint();
     });

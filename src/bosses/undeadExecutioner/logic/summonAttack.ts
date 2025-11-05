@@ -17,6 +17,15 @@ export function performSummon(boss: UndeadExecutioner) {
   boss.moveToAndWait(target.x, target.y, 250, () => {
     boss.play("boss_summon", true);
 
+    const summonSound = boss.sounds?.boss_summon_audio as
+      | Phaser.Sound.WebAudioSound
+      | undefined;
+    if (summonSound && !summonSound.isPlaying) {
+      summonSound.loop = true;
+      summonSound.volume = 0.8;
+      summonSound.play();
+    }
+
     const summonInterval = boss.scene.time.addEvent({
       delay: 6000,
       loop: true,
@@ -26,6 +35,9 @@ export function performSummon(boss: UndeadExecutioner) {
 
     const endTimer = boss.scene.time.delayedCall(8000, () => {
       summonInterval.remove();
+      if (summonSound && summonSound.isPlaying) {
+        summonSound.stop();
+      }
       if (!boss.active || boss.isDead) return;
       boss.play("boss_idle");
       boss.endAttack(1750);

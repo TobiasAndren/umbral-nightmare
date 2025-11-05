@@ -9,11 +9,20 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
 
   public state: "idle" | "attacking" | "dead" = "idle";
 
+  public sounds?: Record<string, Phaser.Sound.BaseSound>;
+
   public deathCallback?: () => void;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    texture: string,
+    bossSounds?: Record<string, Phaser.Sound.BaseSound>
+  ) {
     super(scene, x, y, texture);
 
+    this.sounds = bossSounds;
     this.maxHealth = 20;
     this.currentHealth = this.maxHealth;
 
@@ -35,7 +44,9 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
     this.currentHealth -= amount;
     this.isHurt = true;
 
+    this.sounds?.boss_hurt_audio?.play({ volume: 0.3 });
     this.setTint(0xff0000);
+
     this.scene.time.delayedCall(100, () => {
       this.clearTint();
     });

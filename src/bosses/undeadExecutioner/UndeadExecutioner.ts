@@ -18,8 +18,15 @@ export default class UndeadExecutioner extends Boss {
   public meleeBody!: Phaser.Physics.Arcade.Body;
   public meleeOverlapAdded: boolean = false;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    bossSounds: Record<string, Phaser.Sound.BaseSound>
+  ) {
     super(scene, x, y, "boss_idle");
+
+    this.sounds = bossSounds;
 
     this.projectileGroup = this.scene.physics.add.group({
       allowGravity: false,

@@ -62,6 +62,14 @@ export function performMeleeAttack(boss: UndeadExecutioner) {
           } else {
             boss.meleeBody.enable = false;
           }
+
+          if (frame.index === 2) {
+            boss.scene.sound.play("boss_attack_audio", { volume: 0.6 });
+          }
+
+          if (frame.index === 10) {
+            boss.scene.sound.play("boss_attack_audio", { volume: 0.6 });
+          }
         };
 
         boss.on(Phaser.Animations.Events.ANIMATION_UPDATE, onFrameUpdate);

@@ -15,9 +15,10 @@ export function performSkillMove(boss: UndeadExecutioner) {
     boss.play("boss_skill", true);
     const delayTimer = boss.scene.time.delayedCall(attackDelay, () => {
       for (let i = 0; i < 4; i++) {
-        const ringTimer = boss.scene.time.delayedCall(i * 1000, () =>
-          spawnProjectileRing(boss)
-        );
+        const ringTimer = boss.scene.time.delayedCall(i * 1000, () => {
+          boss.sounds?.boss_skill_audio?.play({ volume: 0.6 });
+          spawnProjectileRing(boss);
+        });
         boss.currentAttackTimers.push(ringTimer);
       }
 
