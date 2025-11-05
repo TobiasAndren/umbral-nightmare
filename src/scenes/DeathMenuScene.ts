@@ -13,6 +13,8 @@ export class DeathMenuScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.audio("button_click", "assets/audio/ui/button-click.wav");
+    this.load.audio("button_hover", "assets/audio/ui/button-hover.wav");
     this.load.audio("menu_ambience", "assets/audio/ambience/menu-ambience.wav");
     preloadForestBackground(this);
   }

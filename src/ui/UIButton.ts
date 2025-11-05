@@ -15,8 +15,14 @@ export class UIButton {
   private bg: Phaser.GameObjects.Rectangle;
   private text: Phaser.GameObjects.Text;
 
+  private hoverSound?: Phaser.Sound.BaseSound;
+  private clickSound?: Phaser.Sound.BaseSound;
+
   constructor({ x, y, text, scene, onClick, width, height }: ButtonConfig) {
     this.scene = scene;
+
+    this.hoverSound = scene.sound.add("button_hover", { volume: 0.5 });
+    this.clickSound = scene.sound.add("button_click", { volume: 0.5 });
 
     this.text = scene.add
       .text(x, y, text, {
@@ -50,6 +56,7 @@ export class UIButton {
 
   private addInteractivity(onClick: () => void) {
     this.text.on("pointerover", () => {
+      this.hoverSound?.play();
       this.scene.tweens.add({
         targets: [this.text, this.bg],
         scale: 1.03,
@@ -109,6 +116,9 @@ export class UIButton {
       });
     });
 
-    this.text.on("pointerdown", onClick);
+    this.text.on("pointerdown", () => {
+      this.clickSound?.play();
+      onClick();
+    });
   }
 }

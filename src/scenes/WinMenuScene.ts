@@ -11,6 +11,8 @@ export class WinMenuScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.audio("button_click", "assets/audio/ui/button-click.wav");
+    this.load.audio("button_hover", "assets/audio/ui/button-hover.wav");
     preloadForestBackground(this);
   }
 
