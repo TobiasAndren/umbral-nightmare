@@ -6,12 +6,20 @@ export default class ShadowEnemy extends Enemy {
   private attackHitbox?: Phaser.GameObjects.Rectangle;
   private attackBody?: Phaser.Physics.Arcade.Body;
   private overlapSet = false;
+  private isWalkingSoundPlaying: boolean = false;
   deathAnimKey = "shadow_death";
   hurtAnimKey = "shadow_hurt";
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    enemySounds?: Record<string, Phaser.Sound.BaseSound>
+  ) {
     super(scene, x, y, "shadow_idle");
     this.speed = 50;
+
+    this.sounds = enemySounds;
 
     this.attackHitbox = scene.add.rectangle(
       this.x,
@@ -66,6 +74,8 @@ export default class ShadowEnemy extends Enemy {
 
       if (!this.isAttacking) {
         this.isAttacking = true;
+
+        this.sounds?.enemy_attack_audio?.play({ volume: 0.6 });
         this.play("shadow_attack1");
 
         const onFrameUpdate = (
@@ -106,6 +116,16 @@ export default class ShadowEnemy extends Enemy {
         !this.anims.isPlaying
       ) {
         this.play("shadow_walk", true);
+      }
+
+      if (!this.isWalkingSoundPlaying) {
+        this.sounds?.enemy_run_audio?.play({ loop: true, volume: 0.2 });
+        this.isWalkingSoundPlaying = true;
+      }
+
+      if (this.body!.velocity.x === 0 && this.isWalkingSoundPlaying) {
+        this.sounds?.enemy_run_audio?.stop();
+        this.isWalkingSoundPlaying = false;
       }
 
       return;

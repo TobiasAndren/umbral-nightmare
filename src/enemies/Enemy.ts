@@ -9,6 +9,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected deathAnimKey?: string;
   protected hurtAnimKey?: string;
 
+  protected sounds?: Record<string, Phaser.Sound.BaseSound>;
+
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
     super(scene, x, y, texture);
     scene.add.existing(this);
@@ -26,6 +28,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.health -= amount;
 
     this.isHurt = true;
+
+    this.sounds?.enemy_hurt_audio?.play({ volume: 0.2 });
 
     this.setTintFill(0x880200);
 

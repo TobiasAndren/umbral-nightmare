@@ -12,16 +12,16 @@ export const enemyAudioConfigs: AudioConfig[] = [
   },
   {
     key: "enemy_attack_audio",
-    file: "enemy-attack.wav",
+    file: "enemy-attack.mp3",
   },
   {
     key: "enemy_hurt_audio",
-    file: "enemy-damage.wav",
+    file: "demon-damage.wav",
   },
 ];
 
-export function preloadenemySprites(scene: Phaser.Scene) {
+export function preloadEnemyAudio(scene: Phaser.Scene) {
   enemyAudioConfigs.forEach((config) => {
-    scene.load.audio(config.key, `assets/enemy/${config.file}`);
+    scene.load.audio(config.key, `assets/audio/enemy/${config.file}`);
   });
 }

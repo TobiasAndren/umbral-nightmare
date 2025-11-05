@@ -16,6 +16,7 @@ import { preloadPlayerHealth } from "../helpers/uiLoaders/preloadPlayerHealth";
 import { setupPlayerHealth } from "../player/playerHealth";
 import { createTreeBranch } from "../environment/createTreeBranch";
 import { preloadPlayerAudio } from "../helpers/audioLoaders/preloadPlayerAudio";
+import { preloadEnemyAudio } from "../helpers/audioLoaders/preloadEnemyAudio";
 
 export default class MainScene extends Phaser.Scene {
   private backgroundLayers?: {
@@ -27,6 +28,7 @@ export default class MainScene extends Phaser.Scene {
 
   private ambience?: Phaser.Sound.BaseSound;
   private playerSounds!: Record<string, Phaser.Sound.BaseSound>;
+  private enemySounds!: Record<string, Phaser.Sound.BaseSound>;
 
   private player!: Phaser.Physics.Arcade.Sprite;
   private enemies!: Phaser.Physics.Arcade.Group;
@@ -48,6 +50,7 @@ export default class MainScene extends Phaser.Scene {
       "assets/audio/ambience/forest-ambience.wav"
     );
     preloadPlayerAudio(this);
+    preloadEnemyAudio(this);
     preloadForestBackground(this);
     preloadPlayerSprites(this);
     preloadShadowEnemySprites(this);
@@ -177,6 +180,12 @@ export default class MainScene extends Phaser.Scene {
       player_hurt_audio: this.sound.add("player_hurt_audio"),
     };
 
+    this.enemySounds = {
+      enemy_run_audio: this.sound.add("enemy_run_audio"),
+      enemy_attack_audio: this.sound.add("enemy_attack_audio"),
+      enemy_hurt_audio: this.sound.add("enemy_hurt_audio"),
+    };
+
     this.player.setTint(0xffffff);
 
     this.enemies = this.physics.add.group({
@@ -194,7 +203,7 @@ export default class MainScene extends Phaser.Scene {
     ];
 
     enemyPositions.forEach((pos) => {
-      const enemy = new ShadowEnemy(this, pos.x, pos.y);
+      const enemy = new ShadowEnemy(this, pos.x, pos.y, this.enemySounds);
       enemy.setPlayer(this.player);
       enemy.body?.setSize(15, 20);
       enemy.body?.setOffset(25, 20);
