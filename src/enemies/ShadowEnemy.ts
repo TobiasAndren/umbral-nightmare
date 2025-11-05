@@ -58,6 +58,10 @@ export default class ShadowEnemy extends Enemy {
   }
 
   update() {
+    if (this.body!.velocity.x === 0 && this.isWalkingSoundPlaying) {
+      this.sounds?.enemy_run_audio?.stop();
+      this.isWalkingSoundPlaying = false;
+    }
     if (this.isDead) return;
     if (this.isHurt) return;
     if (!this.player) return;
@@ -121,11 +125,6 @@ export default class ShadowEnemy extends Enemy {
       if (!this.isWalkingSoundPlaying) {
         this.sounds?.enemy_run_audio?.play({ loop: true, volume: 0.2 });
         this.isWalkingSoundPlaying = true;
-      }
-
-      if (this.body!.velocity.x === 0 && this.isWalkingSoundPlaying) {
-        this.sounds?.enemy_run_audio?.stop();
-        this.isWalkingSoundPlaying = false;
       }
 
       return;

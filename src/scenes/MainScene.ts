@@ -262,6 +262,24 @@ export default class MainScene extends Phaser.Scene {
     this.player.setVelocity(0, 0);
     this.player.body!.enable = false;
 
+    if (this.playerSounds) {
+      for (const key in this.playerSounds) {
+        const sound = this.playerSounds[key];
+        if (sound?.isPlaying) {
+          sound.stop();
+        }
+      }
+    }
+
+    if (this.enemySounds) {
+      for (const key in this.enemySounds) {
+        const sound = this.enemySounds[key];
+        if (sound?.isPlaying) {
+          sound.stop();
+        }
+      }
+    }
+
     if (this.ambience) {
       this.tweens.add({
         targets: this.ambience,
