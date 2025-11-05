@@ -5,7 +5,8 @@ export function setupPlayerHealth(
   scene: Phaser.Scene,
   maxHealth: number = 5,
   heartPosX: number = 410,
-  heartPosY: number = 195
+  heartPosY: number = 195,
+  ambience?: Phaser.Sound.BaseSound
 ) {
   const hearts: Phaser.GameObjects.Image[] = [];
   for (let i = 0; i < maxHealth; i++) {
@@ -89,6 +90,20 @@ export function setupPlayerHealth(
     player.anims.play("death");
     player.setVelocity(0);
     player.body!.enable = false;
+
+    if (ambience && ambience.isPlaying) {
+      const webAudio = ambience as Phaser.Sound.WebAudioSound;
+      scene.tweens.add({
+        targets: webAudio,
+        volume: { from: webAudio.volume, to: 0 },
+        duration: 1000,
+        ease: "Linear",
+        onComplete: () => webAudio.stop(),
+      });
+    }
+
+    const camera = scene.cameras.main;
+    camera.fadeOut(2000, 0, 0, 0);
 
     player.once(
       Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + "death",

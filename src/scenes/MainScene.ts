@@ -55,10 +55,17 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.ambience = this.sound.add("forest_ambience", {
       loop: true,
-      volume: 0.4,
+      volume: 0,
     });
 
     this.ambience.play();
+
+    this.tweens.add({
+      targets: this.ambience,
+      volume: 0.4,
+      duration: 1000,
+      ease: "Sine.easeIn",
+    });
     this.backgroundLayers = createForestBackground(this, true);
 
     const startTreeX = 0;
@@ -198,7 +205,7 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, 1, 1, -50, 0);
     this.cameras.main.setDeadzone(0, 100);
 
-    setupPlayerHealth(this.player, this, 5);
+    setupPlayerHealth(this.player, this, 5, 410, 195, this.ambience);
     setupPlayerControls(this.player, this, this.enemies);
 
     this.player.play("idle");

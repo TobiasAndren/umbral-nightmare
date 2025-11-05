@@ -52,10 +52,18 @@ export default class BossScene extends Phaser.Scene {
   create() {
     this.ambience = this.sound.add("cave_ambience", {
       loop: true,
-      volume: 0.4,
+      volume: 0,
     });
 
     this.ambience.play();
+
+    this.tweens.add({
+      targets: this.ambience,
+      volume: 0.4,
+      duration: 1000,
+      ease: "Sine.easeIn",
+    });
+
     createCaveBackground(this);
     this.ground = createCaveGroundSegments(this, [{ x: -100, width: 5000 }]);
 
@@ -144,7 +152,12 @@ export default class BossScene extends Phaser.Scene {
           });
         }
 
-        this.scene.start("WinMenuScene");
+        const cam = this.cameras.main;
+        cam.fadeOut(1000, 0, 0, 0);
+
+        cam.once("camerafadeoutcomplete", () => {
+          this.scene.start("WinMenuScene");
+        });
       });
     };
   }
