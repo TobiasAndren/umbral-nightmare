@@ -4,7 +4,8 @@ import Enemy from "../enemies/Enemy";
 export function setupPlayerAttack(
   player: Phaser.Physics.Arcade.Sprite,
   scene: Phaser.Scene,
-  enemies?: Phaser.Physics.Arcade.Group
+  enemies?: Phaser.Physics.Arcade.Group,
+  playerSounds?: Record<string, Phaser.Sound.BaseSound>
 ) {
   const attackHitBox = scene.add.rectangle(
     player.x,
@@ -42,6 +43,10 @@ export function setupPlayerAttack(
     if (state.isAttacking) return;
     state.isAttacking = true;
     state.attackQueued = false;
+
+    if (playerSounds?.player_attack_audio) {
+      playerSounds.player_attack_audio.play({ volume: 0.3 });
+    }
 
     player.anims.play("attack", true);
 

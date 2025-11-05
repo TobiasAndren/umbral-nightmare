@@ -6,10 +6,11 @@ import { setupPlayerAttack } from "./playerAttack";
 export function setupPlayerControls(
   player: Phaser.Physics.Arcade.Sprite,
   scene: Phaser.Scene,
-  enemies?: Phaser.Physics.Arcade.Group
+  enemies?: Phaser.Physics.Arcade.Group,
+  playerSounds?: Record<string, Phaser.Sound.BaseSound>
 ) {
   const { cursors, keys } = setupPlayerInput(scene);
-  const attack = setupPlayerAttack(player, scene, enemies);
+  const attack = setupPlayerAttack(player, scene, enemies, playerSounds);
 
   scene.events.on("update", () => {
     if (!player.body || player.getData("isDead")) return;
@@ -25,7 +26,8 @@ export function setupPlayerControls(
       cursors,
       keys,
       attack.state.isAttacking,
-      isKnockedBack
+      isKnockedBack,
+      playerSounds
     );
 
     if (attack.state.isAttacking) {

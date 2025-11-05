@@ -15,6 +15,7 @@ import { createForestPlatforms } from "../environment/createForestPlatforms";
 import { preloadPlayerHealth } from "../helpers/uiLoaders/preloadPlayerHealth";
 import { setupPlayerHealth } from "../player/playerHealth";
 import { createTreeBranch } from "../environment/createTreeBranch";
+import { preloadPlayerAudio } from "../helpers/audioLoaders/preloadPlayerAudio";
 
 export default class MainScene extends Phaser.Scene {
   private backgroundLayers?: {
@@ -25,6 +26,7 @@ export default class MainScene extends Phaser.Scene {
   };
 
   private ambience?: Phaser.Sound.BaseSound;
+  private playerSounds!: Record<string, Phaser.Sound.BaseSound>;
 
   private player!: Phaser.Physics.Arcade.Sprite;
   private enemies!: Phaser.Physics.Arcade.Group;
@@ -45,6 +47,7 @@ export default class MainScene extends Phaser.Scene {
       "forest_ambience",
       "assets/audio/ambience/forest-ambience.wav"
     );
+    preloadPlayerAudio(this);
     preloadForestBackground(this);
     preloadPlayerSprites(this);
     preloadShadowEnemySprites(this);
@@ -62,10 +65,11 @@ export default class MainScene extends Phaser.Scene {
 
     this.tweens.add({
       targets: this.ambience,
-      volume: 0.4,
+      volume: 0.05,
       duration: 1000,
       ease: "Sine.easeIn",
     });
+
     this.backgroundLayers = createForestBackground(this, true);
 
     const startTreeX = 0;
@@ -167,6 +171,12 @@ export default class MainScene extends Phaser.Scene {
     this.player.body?.setSize(15, 15);
     this.player.setDepth(1);
 
+    this.playerSounds = {
+      player_run_audio: this.sound.add("player_run_audio"),
+      player_attack_audio: this.sound.add("player_attack_audio"),
+      player_hurt_audio: this.sound.add("player_hurt_audio"),
+    };
+
     this.player.setTint(0xffffff);
 
     this.enemies = this.physics.add.group({
@@ -205,8 +215,16 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, 1, 1, -50, 0);
     this.cameras.main.setDeadzone(0, 100);
 
-    setupPlayerHealth(this.player, this, 5, 410, 195, this.ambience);
-    setupPlayerControls(this.player, this, this.enemies);
+    setupPlayerHealth(
+      this.player,
+      this,
+      5,
+      410,
+      195,
+      this.ambience,
+      this.playerSounds
+    );
+    setupPlayerControls(this.player, this, this.enemies, this.playerSounds);
 
     this.player.play("idle");
 

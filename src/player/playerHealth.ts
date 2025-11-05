@@ -6,7 +6,8 @@ export function setupPlayerHealth(
   maxHealth: number = 5,
   heartPosX: number = 410,
   heartPosY: number = 195,
-  ambience?: Phaser.Sound.BaseSound
+  ambience?: Phaser.Sound.BaseSound,
+  playerSounds?: Record<string, Phaser.Sound.BaseSound>
 ) {
   const hearts: Phaser.GameObjects.Image[] = [];
   for (let i = 0; i < maxHealth; i++) {
@@ -74,7 +75,11 @@ export function setupPlayerHealth(
       },
     });
 
+    if (playerSounds?.player_hurt_audio) {
+      playerSounds.player_hurt_audio.play({ volume: 0.8 });
+    }
     player.anims.play("hurt", true);
+
     player.setData("isInvincible", true);
     scene.time.delayedCall(500, () => {
       player.setData("isInvincible", false);
