@@ -15,6 +15,19 @@ export function setupPlayerControls(
   scene.events.on("update", () => {
     if (!player.body || player.getData("isDead")) return;
 
+    if (
+      Phaser.Input.Keyboard.JustDown(keys.ESC) ||
+      Phaser.Input.Keyboard.JustDown(keys.P)
+    ) {
+      if (scene.scene.isActive("PauseMenuScene")) {
+        scene.scene.stop("PauseMenuScene");
+        scene.scene.resume(scene.scene.key);
+      } else {
+        scene.scene.launch("PauseMenuScene");
+        scene.scene.pause();
+      }
+    }
+
     const isKnockedBack = player.getData("isKnockedBack");
 
     if (Phaser.Input.Keyboard.JustDown(cursors.space || keys.SPACE)) {

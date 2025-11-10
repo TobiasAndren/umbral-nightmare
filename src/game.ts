@@ -4,6 +4,8 @@ import BossScene from "./scenes/BossScene";
 import { StartMenuScene } from "./scenes/StartMenuScene";
 import { DeathMenuScene } from "./scenes/DeathMenuScene";
 import { WinMenuScene } from "./scenes/WinMenuScene";
+import { PauseMenuScene } from "./scenes/PauseMenuScene";
+import { SettingsMenuScene } from "./scenes/SettingsMenuScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -23,7 +25,15 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  scene: [StartMenuScene, MainScene, BossScene, DeathMenuScene, WinMenuScene],
+  scene: [
+    StartMenuScene,
+    MainScene,
+    BossScene,
+    DeathMenuScene,
+    WinMenuScene,
+    PauseMenuScene,
+    SettingsMenuScene,
+  ],
   render: {
     pixelArt: true,
     roundPixels: true,

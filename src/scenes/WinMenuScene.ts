@@ -33,7 +33,6 @@ export class WinMenuScene extends Phaser.Scene {
       x: this.scale.width / 2,
       y: 325,
       text: "Play Again",
-      width: 180,
       onClick: () => this.scene.start("MainScene"),
     });
 
@@ -42,7 +41,6 @@ export class WinMenuScene extends Phaser.Scene {
       x: this.scale.width / 2,
       y: 400,
       text: "Main Menu",
-      width: 180,
       onClick: () => this.scene.start("StartMenuScene"),
     });
   }

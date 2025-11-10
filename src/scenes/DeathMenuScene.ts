@@ -52,7 +52,6 @@ export class DeathMenuScene extends Phaser.Scene {
       y: 325,
       text: "Restart",
       onClick: () => this.handleSceneChange("MainScene"),
-      width: 180,
     });
 
     new UIButton({
@@ -61,7 +60,6 @@ export class DeathMenuScene extends Phaser.Scene {
       y: 400,
       text: "Main Menu",
       onClick: () => this.handleSceneChange("StartMenuScene"),
-      width: 180,
     });
   }
 

@@ -8,6 +8,8 @@ export function setupPlayerInput(scene: Phaser.Scene) {
     S: Phaser.Input.Keyboard.KeyCodes.S,
     D: Phaser.Input.Keyboard.KeyCodes.D,
     SPACE: Phaser.Input.Keyboard.KeyCodes.SPACE,
+    ESC: Phaser.Input.Keyboard.KeyCodes.ESC,
+    P: Phaser.Input.Keyboard.KeyCodes.P,
   }) as { [key: string]: Phaser.Input.Keyboard.Key };
 
   return { cursors, keys };

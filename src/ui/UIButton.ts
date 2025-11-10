@@ -18,7 +18,15 @@ export class UIButton {
   private hoverSound?: Phaser.Sound.BaseSound;
   private clickSound?: Phaser.Sound.BaseSound;
 
-  constructor({ x, y, text, scene, onClick, width, height }: ButtonConfig) {
+  constructor({
+    x,
+    y,
+    text,
+    scene,
+    onClick,
+    width = 180,
+    height,
+  }: ButtonConfig) {
     this.scene = scene;
 
     this.hoverSound = scene.sound.add("button_hover", { volume: 0.5 });

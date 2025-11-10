@@ -49,6 +49,19 @@ export class StartMenuScene extends Phaser.Scene {
       text: "Start Game",
       onClick: () => this.handleSceneChange("MainScene"),
     });
+
+    new UIButton({
+      scene: this,
+      x: this.scale.width / 2,
+      y: 400,
+      text: "Settings",
+      onClick: () => {
+        this.scene.pause();
+        this.scene.launch("SettingsMenuScene", {
+          previousScene: "StartMenuScene",
+        });
+      },
+    });
   }
 
   private handleSceneChange(nextSceneKey: string) {
