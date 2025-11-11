@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { getActivePreset } from "../config/controllerConfig";
 
 export function setupPlayerInput(scene: Phaser.Scene) {
   const cursors = scene.input.keyboard!.createCursorKeys();
@@ -12,5 +13,28 @@ export function setupPlayerInput(scene: Phaser.Scene) {
     P: Phaser.Input.Keyboard.KeyCodes.P,
   }) as { [key: string]: Phaser.Input.Keyboard.Key };
 
-  return { cursors, keys };
+  return {
+    cursors,
+    keys,
+
+    isJumpPressed: () => {
+      const preset = getActivePreset();
+      if (preset.jump === "W") {
+        return keys.W.isDown || cursors.up.isDown;
+      }
+      if (preset.jump === "SPACE") {
+        return keys.SPACE.isDown;
+      }
+      return false;
+    },
+
+    isAttackPressed: () => {
+      const preset = getActivePreset();
+      if (preset.attack === "SPACE")
+        return Phaser.Input.Keyboard.JustDown(keys.SPACE);
+      if (preset.attack === "MOUSE_LEFT_BUTTON")
+        return scene.input.activePointer.isDown;
+      return false;
+    },
+  };
 }

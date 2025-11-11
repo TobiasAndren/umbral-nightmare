@@ -31,7 +31,7 @@ export class SettingsMenuScene extends Phaser.Scene {
 
     createForestBackground(this, false);
 
-    const title = this.add.text(width / 2, 150, "Settings", {
+    const title = this.add.text(width / 2, 200, "Settings", {
       fontSize: "64px",
       fontFamily: "Metal Mania, serif",
       color: "#ffffff",
@@ -55,7 +55,10 @@ export class SettingsMenuScene extends Phaser.Scene {
       x: width / 2,
       y: 400,
       text: "Controller",
-      onClick: () => {},
+      onClick: () => {
+        this.scene.pause();
+        this.scene.launch("ControllerSettingsScene");
+      },
     });
 
     new UIButton({

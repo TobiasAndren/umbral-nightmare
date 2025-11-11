@@ -10,15 +10,15 @@ export function setupPlayerControls(
   enemies?: Phaser.Physics.Arcade.Group,
   audio?: GameAudio
 ) {
-  const { cursors, keys } = setupPlayerInput(scene);
+  const input = setupPlayerInput(scene);
   const attack = setupPlayerAttack(player, scene, enemies, audio);
 
   scene.events.on("update", () => {
     if (!player.body || player.getData("isDead")) return;
 
     if (
-      Phaser.Input.Keyboard.JustDown(keys.ESC) ||
-      Phaser.Input.Keyboard.JustDown(keys.P)
+      Phaser.Input.Keyboard.JustDown(input.keys.ESC) ||
+      Phaser.Input.Keyboard.JustDown(input.keys.P)
     ) {
       if (scene.scene.isActive("PauseMenuScene")) {
         scene.scene.stop("PauseMenuScene");
@@ -33,14 +33,13 @@ export function setupPlayerControls(
 
     const isKnockedBack = player.getData("isKnockedBack");
 
-    if (Phaser.Input.Keyboard.JustDown(cursors.space || keys.SPACE)) {
+    if (input.isAttackPressed()) {
       attack.queueAttack();
     }
 
     handleMovement(
       player,
-      cursors,
-      keys,
+      input,
       attack.state.isAttacking,
       isKnockedBack,
       audio

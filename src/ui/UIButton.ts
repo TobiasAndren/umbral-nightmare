@@ -41,8 +41,7 @@ export class UIButton {
         color: "#ffffff",
         padding: { x: 20, y: 10 },
       })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
+      .setOrigin(0.5);
 
     const bgWidth = width ?? this.text.width + 5;
     const bgHeight = height ?? this.text.height + 5;
@@ -56,7 +55,8 @@ export class UIButton {
         Phaser.Display.Color.HexStringToColor("#1c3c4b").color
       )
       .setStrokeStyle(1, 0xffffff)
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
 
     this.bg.setDepth(0);
     this.text.setDepth(1);
@@ -65,7 +65,7 @@ export class UIButton {
   }
 
   private addInteractivity(onClick: () => void) {
-    this.text.on("pointerover", () => {
+    this.bg.on("pointerover", () => {
       this.hoverSound?.play();
       this.scene.tweens.add({
         targets: [this.text, this.bg],
@@ -96,7 +96,7 @@ export class UIButton {
       });
     });
 
-    this.text.on("pointerout", () => {
+    this.bg.on("pointerout", () => {
       this.scene.tweens.add({
         targets: [this.text, this.bg],
         scale: 1.0,
@@ -126,7 +126,7 @@ export class UIButton {
       });
     });
 
-    this.text.on("pointerdown", () => {
+    this.bg.on("pointerdown", () => {
       this.clickSound?.play();
       onClick();
     });

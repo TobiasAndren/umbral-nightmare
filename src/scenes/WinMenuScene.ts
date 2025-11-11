@@ -19,7 +19,7 @@ export class WinMenuScene extends Phaser.Scene {
   create() {
     createForestBackground(this, false);
 
-    const title = this.add.text(this.scale.width / 2, 150, "You Win!", {
+    const title = this.add.text(this.scale.width / 2, 200, "You Win!", {
       fontSize: "64px",
       fontFamily: "Metal Mania, serif",
       color: "#55ff55",

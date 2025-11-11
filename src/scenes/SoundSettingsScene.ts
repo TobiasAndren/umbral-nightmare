@@ -37,7 +37,7 @@ export class SoundSettingsScene extends Phaser.Scene {
 
     createForestBackground(this, false);
 
-    const title = this.add.text(width / 2, 150, "Sound Settings", {
+    const title = this.add.text(width / 2, 200, "Sound Settings", {
       fontSize: "64px",
       fontFamily: "Metal Mania, serif",
       color: "#ffffff",

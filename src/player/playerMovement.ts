@@ -3,8 +3,7 @@ import type { GameAudio } from "../helpers/gameAudio/GameAudio";
 
 export function handleMovement(
   player: Phaser.Physics.Arcade.Sprite,
-  cursors: any,
-  keys: any,
+  input: any,
   isAttacking: boolean,
   isKnockedBack: boolean,
   audio?: GameAudio
@@ -14,12 +13,12 @@ export function handleMovement(
   let moving = false;
   const onGround = player.body!.blocked.down;
 
-  if (cursors.left.isDown || keys.A.isDown) {
+  if (input.cursors.left.isDown || input.keys.A.isDown) {
     player.setVelocityX(-150);
     if (!isAttacking && onGround) player.anims.play("run", true);
     player.setFlipX(true);
     moving = true;
-  } else if (cursors.right.isDown || keys.D.isDown) {
+  } else if (input.cursors.right.isDown || input.keys.D.isDown) {
     player.setVelocityX(150);
     if (!isAttacking && onGround) player.anims.play("run", true);
     player.setFlipX(false);
@@ -28,7 +27,7 @@ export function handleMovement(
     player.setVelocityX(0);
   }
 
-  if ((cursors.up.isDown || keys.W.isDown) && onGround) {
+  if (input.isJumpPressed() && onGround) {
     player.setVelocityY(-300);
     if (!isAttacking) player.anims.play("jump", true);
   }
