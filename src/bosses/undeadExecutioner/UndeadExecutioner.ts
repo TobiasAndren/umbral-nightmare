@@ -4,6 +4,7 @@ import { moveToAndWait, handleMovementUpdate } from "./logic/movementLogic";
 import { performMeleeAttack } from "./logic/meleeAttack";
 import { performSkillMove } from "./logic/skillAttack";
 import { performSummon } from "./logic/summonAttack";
+import type { GameAudio } from "../../helpers/gameAudio/GameAudio";
 
 export default class UndeadExecutioner extends Boss {
   public attackCooldown = false;
@@ -18,15 +19,10 @@ export default class UndeadExecutioner extends Boss {
   public meleeBody!: Phaser.Physics.Arcade.Body;
   public meleeOverlapAdded: boolean = false;
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    bossSounds: Record<string, Phaser.Sound.BaseSound>
-  ) {
+  constructor(scene: Phaser.Scene, x: number, y: number, audio?: GameAudio) {
     super(scene, x, y, "boss_idle");
 
-    this.sounds = bossSounds;
+    this.audio = audio;
 
     this.projectileGroup = this.scene.physics.add.group({
       allowGravity: false,

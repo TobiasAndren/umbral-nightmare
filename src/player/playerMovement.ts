@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import type { GameAudio } from "../helpers/gameAudio/GameAudio";
 
 export function handleMovement(
   player: Phaser.Physics.Arcade.Sprite,
@@ -6,7 +7,7 @@ export function handleMovement(
   keys: any,
   isAttacking: boolean,
   isKnockedBack: boolean,
-  playerSounds?: Record<string, Phaser.Sound.BaseSound>
+  audio?: GameAudio
 ) {
   if (isKnockedBack) return false;
 
@@ -30,35 +31,41 @@ export function handleMovement(
   if ((cursors.up.isDown || keys.W.isDown) && onGround) {
     player.setVelocityY(-300);
     if (!isAttacking) player.anims.play("jump", true);
-
-    if (playerSounds?.player_run_audio?.isPlaying) {
-      playerSounds.player_run_audio.stop();
-    }
   }
 
   if (!onGround && player.body!.velocity.y > 0) {
     if (!isAttacking) player.anims.play("fall", true);
-    if (playerSounds?.player_run_audio?.isPlaying) {
-      playerSounds.player_run_audio.stop();
-    }
   }
 
   if (!isAttacking && !moving && onGround) {
     player.anims.play("idle", true);
-    if (playerSounds?.player_run_audio?.isPlaying) {
-      playerSounds.player_run_audio.stop();
-    }
   }
 
-  if (playerSounds?.player_run_audio) {
-    if (moving && onGround) {
-      if (!playerSounds.player_run_audio.isPlaying) {
-        playerSounds.player_run_audio.play({ loop: true, volume: 0.6 });
-      }
-    } else {
-      if (playerSounds.player_run_audio.isPlaying) {
-        playerSounds.player_run_audio.stop();
-      }
+  if (!player.data) player.setDataEnabled();
+
+  if (!player.getData("footstepTimer")) {
+    player.setData("footstepTimer", null as Phaser.Time.TimerEvent | null);
+  }
+
+  if (moving && onGround && !isAttacking) {
+    if (!player.getData("footstepTimer")) {
+      const timer = player.scene.time.addEvent({
+        delay: 300,
+        loop: true,
+        callback: () => {
+          if (audio) {
+            audio.playSFX("player_run_audio");
+          }
+        },
+      });
+      player.setData("footstepTimer", timer);
+    }
+  } else {
+    const timer: Phaser.Time.TimerEvent | null =
+      player.getData("footstepTimer");
+    if (timer) {
+      timer.remove(false);
+      player.setData("footstepTimer", null);
     }
   }
 

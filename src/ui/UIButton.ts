@@ -8,6 +8,7 @@ interface ButtonConfig {
   onClick: () => void;
   width?: number;
   height?: number;
+  fontSize?: string;
 }
 
 export class UIButton {
@@ -26,15 +27,16 @@ export class UIButton {
     onClick,
     width = 180,
     height,
+    fontSize = "32px",
   }: ButtonConfig) {
     this.scene = scene;
 
-    this.hoverSound = scene.sound.add("button_hover", { volume: 0.5 });
+    this.hoverSound = scene.sound.add("button_hover", { volume: 1 });
     this.clickSound = scene.sound.add("button_click", { volume: 0.5 });
 
     this.text = scene.add
       .text(x, y, text, {
-        fontSize: "32px",
+        fontSize: fontSize,
         fontFamily: "Metal Mania, serif",
         color: "#ffffff",
         padding: { x: 20, y: 10 },

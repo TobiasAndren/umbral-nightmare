@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import type { GameAudio } from "../helpers/gameAudio/GameAudio";
 
 export function setupPlayerHealth(
   player: Phaser.Physics.Arcade.Sprite,
@@ -6,8 +7,7 @@ export function setupPlayerHealth(
   maxHealth: number = 5,
   heartPosX: number = 410,
   heartPosY: number = 195,
-  ambience?: Phaser.Sound.BaseSound,
-  playerSounds?: Record<string, Phaser.Sound.BaseSound>
+  audio?: GameAudio
 ) {
   const hearts: Phaser.GameObjects.Image[] = [];
   for (let i = 0; i < maxHealth; i++) {
@@ -75,9 +75,7 @@ export function setupPlayerHealth(
       },
     });
 
-    if (playerSounds?.player_hurt_audio) {
-      playerSounds.player_hurt_audio.play({ volume: 0.8 });
-    }
+    audio?.playSFX("player_hurt_audio");
     player.anims.play("hurt", true);
 
     player.setData("isInvincible", true);
@@ -96,14 +94,19 @@ export function setupPlayerHealth(
     player.setVelocity(0);
     player.body!.enable = false;
 
-    if (ambience && ambience.isPlaying) {
-      const webAudio = ambience as Phaser.Sound.WebAudioSound;
-      scene.tweens.add({
-        targets: webAudio,
-        volume: { from: webAudio.volume, to: 0 },
-        duration: 1000,
-        ease: "Linear",
-        onComplete: () => webAudio.stop(),
+    if (audio) {
+      Object.keys(audio.bgMusic).forEach((key) => {
+        const music = audio.bgMusic[key];
+        if (music.isPlaying) {
+          const webAudio = music as Phaser.Sound.WebAudioSound;
+          scene.tweens.add({
+            targets: music,
+            volume: { from: webAudio.volume, to: 0 },
+            duration: 1000,
+            ease: "Linear",
+            onComplete: () => music.stop(),
+          });
+        }
       });
     }
 

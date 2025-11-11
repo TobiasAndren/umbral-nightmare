@@ -6,6 +6,7 @@ import { DeathMenuScene } from "./scenes/DeathMenuScene";
 import { WinMenuScene } from "./scenes/WinMenuScene";
 import { PauseMenuScene } from "./scenes/PauseMenuScene";
 import { SettingsMenuScene } from "./scenes/SettingsMenuScene";
+import { SoundSettingsScene } from "./scenes/SoundSettingsScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -33,6 +34,7 @@ const config: Phaser.Types.Core.GameConfig = {
     WinMenuScene,
     PauseMenuScene,
     SettingsMenuScene,
+    SoundSettingsScene,
   ],
   render: {
     pixelArt: true,

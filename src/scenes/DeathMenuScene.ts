@@ -4,9 +4,11 @@ import {
   preloadForestBackground,
 } from "../helpers/backgroundLoaders/preloadForestBackground";
 import { UIButton } from "../ui/UIButton";
+import type { GameAudio } from "../helpers/gameAudio/GameAudio";
+import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
 
 export class DeathMenuScene extends Phaser.Scene {
-  private ambience?: Phaser.Sound.BaseSound;
+  private audio?: GameAudio;
 
   constructor() {
     super({ key: "DeathMenuScene" });
@@ -22,19 +24,9 @@ export class DeathMenuScene extends Phaser.Scene {
   create() {
     createForestBackground(this, false);
 
-    this.ambience = this.sound.add("menu_ambience", {
-      loop: true,
-      volume: 0,
-    });
+    this.audio = getGameAudio(this);
 
-    this.ambience.play();
-
-    this.tweens.add({
-      targets: this.ambience,
-      volume: 0.4,
-      duration: 2000,
-      ease: "Sine.easeIn",
-    });
+    this.audio.playMusic("menu_ambience");
 
     const title = this.add.text(this.scale.width / 2, 200, "You Died", {
       fontSize: "64px",
@@ -64,19 +56,7 @@ export class DeathMenuScene extends Phaser.Scene {
   }
 
   private handleSceneChange(nextSceneKey: string) {
-    if (this.ambience) {
-      this.tweens.add({
-        targets: this.ambience,
-        volume: 0,
-        duration: 1000,
-        ease: "Sine.easeOut",
-        onComplete: () => {
-          this.ambience?.stop();
-          this.scene.start(nextSceneKey);
-        },
-      });
-    } else {
-      this.scene.start(nextSceneKey);
-    }
+    this.audio?.stopMusic("menu_ambience");
+    this.scene.start(nextSceneKey);
   }
 }

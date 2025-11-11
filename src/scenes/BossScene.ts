@@ -18,11 +18,11 @@ import {
 } from "../helpers/backgroundLoaders/preloadCaveBackground";
 import { preloadBossAudio } from "../helpers/audioLoaders/preloadBossAudio";
 import { preloadPlayerAudio } from "../helpers/audioLoaders/preloadPlayerAudio";
+import { GameAudio } from "../helpers/gameAudio/GameAudio";
+import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
 
 export default class BossScene extends Phaser.Scene {
-  private ambience?: Phaser.Sound.BaseSound;
-  private bossSounds?: Record<string, Phaser.Sound.BaseSound>;
-  private playerSounds!: Record<string, Phaser.Sound.BaseSound>;
+  private audio!: GameAudio;
 
   private ground!: Phaser.Physics.Arcade.StaticGroup;
   private walls!: Phaser.Physics.Arcade.StaticGroup;
@@ -56,19 +56,12 @@ export default class BossScene extends Phaser.Scene {
   }
 
   create() {
-    this.ambience = this.sound.add("cave_ambience", {
-      loop: true,
-      volume: 0,
-    });
+    this.audio = getGameAudio(this);
 
-    this.ambience.play();
+    this.audio.setMusicVolume(this.audio.musicVolume);
+    this.audio.setSFXVolume(this.audio.sfxVolume);
 
-    this.tweens.add({
-      targets: this.ambience,
-      volume: 0.1,
-      duration: 1000,
-      ease: "Sine.easeIn",
-    });
+    this.audio.playMusic("cave_ambience");
 
     createCaveBackground(this);
     this.ground = createCaveGroundSegments(this, [{ x: -100, width: 5000 }]);
@@ -111,26 +104,12 @@ export default class BossScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
     this.player.setData("isInvincible", true);
 
-    this.playerSounds = {
-      player_run_audio: this.sound.add("player_run_audio"),
-      player_attack_audio: this.sound.add("player_attack_audio"),
-      player_hurt_audio: this.sound.add("player_hurt_audio"),
-    };
-
     this.enemies = this.physics.add.group({
       runChildUpdate: true,
       allowGravity: false,
     });
 
-    this.bossSounds = {
-      boss_skill_audio: this.sound.add("boss_skill_audio"),
-      boss_attack_audio: this.sound.add("boss_attack_audio"),
-      boss_summon_audio: this.sound.add("boss_summon_audio"),
-      boss_hurt_audio: this.sound.add("boss_hurt_audio"),
-      summon_hurt_audio: this.sound.add("summon_hurt_audio"),
-    };
-
-    this.boss = new UndeadExecutioner(this, 575, 275, this.bossSounds);
+    this.boss = new UndeadExecutioner(this, 575, 275, this.audio);
     this.boss.setPlayer(this.player);
     this.boss.body?.setSize(30, 70);
 
@@ -156,29 +135,20 @@ export default class BossScene extends Phaser.Scene {
     this.physics.add.collider(this.boss, this.ground);
     this.physics.add.collider(this.boss, caveBounds);
 
-    setupPlayerHealth(
-      this.player,
-      this,
-      5,
-      375,
-      185,
-      this.ambience,
-      this.playerSounds
-    );
+    setupPlayerHealth(this.player, this, 5, 375, 185, this.audio);
 
     this.boss.deathCallback = () => {
       this.time.delayedCall(1000, () => {
-        if (this.ambience) {
-          this.tweens.add({
-            targets: this.ambience,
-            volume: 0,
-            duration: 1000,
-            ease: "Sine.easeOut",
-            onComplete: () => {
-              this.ambience?.stop();
-            },
-          });
-        }
+        const music = this.audio?.playMusic("cave_ambience");
+
+        this.tweens.add({
+          targets: music,
+          volume: 0,
+          duration: 1000,
+          onComplete: () => {
+            music?.stop();
+          },
+        });
 
         const cam = this.cameras.main;
         cam.fadeOut(1000, 0, 0, 0);
@@ -246,7 +216,7 @@ export default class BossScene extends Phaser.Scene {
 
     this.player.setData("isInvincible", false);
 
-    setupPlayerControls(this.player, this, this.enemies, this.playerSounds);
+    setupPlayerControls(this.player, this, this.enemies, this.audio);
   }
 
   private setupCollisions(caveBounds: Phaser.Physics.Arcade.StaticGroup) {

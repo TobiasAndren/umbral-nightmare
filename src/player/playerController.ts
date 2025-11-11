@@ -2,15 +2,16 @@ import Phaser from "phaser";
 import { setupPlayerInput } from "./playerInput";
 import { handleMovement } from "./playerMovement";
 import { setupPlayerAttack } from "./playerAttack";
+import { GameAudio } from "../helpers/gameAudio/GameAudio";
 
 export function setupPlayerControls(
   player: Phaser.Physics.Arcade.Sprite,
   scene: Phaser.Scene,
   enemies?: Phaser.Physics.Arcade.Group,
-  playerSounds?: Record<string, Phaser.Sound.BaseSound>
+  audio?: GameAudio
 ) {
   const { cursors, keys } = setupPlayerInput(scene);
-  const attack = setupPlayerAttack(player, scene, enemies, playerSounds);
+  const attack = setupPlayerAttack(player, scene, enemies, audio);
 
   scene.events.on("update", () => {
     if (!player.body || player.getData("isDead")) return;
@@ -23,7 +24,9 @@ export function setupPlayerControls(
         scene.scene.stop("PauseMenuScene");
         scene.scene.resume(scene.scene.key);
       } else {
-        scene.scene.launch("PauseMenuScene");
+        scene.scene.launch("PauseMenuScene", {
+          previousSceneKey: scene.scene.key,
+        });
         scene.scene.pause();
       }
     }
@@ -40,7 +43,7 @@ export function setupPlayerControls(
       keys,
       attack.state.isAttacking,
       isKnockedBack,
-      playerSounds
+      audio
     );
 
     if (attack.state.isAttacking) {

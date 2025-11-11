@@ -4,9 +4,11 @@ import {
   preloadForestBackground,
 } from "../helpers/backgroundLoaders/preloadForestBackground";
 import { UIButton } from "../ui/UIButton";
+import type { GameAudio } from "../helpers/gameAudio/GameAudio";
+import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
 
 export class StartMenuScene extends Phaser.Scene {
-  private ambience?: Phaser.Sound.BaseSound;
+  private audio?: GameAudio;
 
   constructor() {
     super({ key: "StartMenuScene" });
@@ -22,17 +24,18 @@ export class StartMenuScene extends Phaser.Scene {
   create() {
     createForestBackground(this, false);
 
-    this.ambience = this.sound.add("menu_ambience", {
-      loop: true,
-      volume: 0,
-    });
-    this.ambience.play();
+    this.audio = getGameAudio(this);
+
+    this.audio.setMusicVolume(this.audio.musicVolume);
+
+    const music = this.audio.playMusic("menu_ambience");
+
+    (music as Phaser.Sound.WebAudioSound).setVolume(0);
 
     this.tweens.add({
-      targets: this.ambience,
-      volume: 0.4,
-      duration: 1000,
-      ease: "Sine.easeIn",
+      targets: music,
+      volume: this.audio.musicVolume,
+      duration: 5000,
     });
 
     const title = this.add.text(this.scale.width / 2, 200, "Umbral Nightmare", {
@@ -65,19 +68,21 @@ export class StartMenuScene extends Phaser.Scene {
   }
 
   private handleSceneChange(nextSceneKey: string) {
-    if (this.ambience) {
-      this.tweens.add({
-        targets: this.ambience,
-        volume: 0,
-        duration: 1000,
-        ease: "Sine.easeOut",
-        onComplete: () => {
-          this.ambience?.stop();
-          this.scene.start(nextSceneKey);
-        },
-      });
-    } else {
+    const music = this.audio?.playMusic("menu_ambience");
+
+    this.tweens.add({
+      targets: music,
+      volume: 0,
+      duration: 1000,
+      onComplete: () => {
+        music?.stop();
+      },
+    });
+
+    this.cameras.main.fadeOut(1200, 0, 0, 0);
+
+    this.time.delayedCall(1200, () => {
       this.scene.start(nextSceneKey);
-    }
+    });
   }
 }

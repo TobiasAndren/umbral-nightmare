@@ -4,8 +4,11 @@ import {
   createForestBackground,
   preloadForestBackground,
 } from "../helpers/backgroundLoaders/preloadForestBackground";
+import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
 
 export class PauseMenuScene extends Phaser.Scene {
+  private previousSceneKey: string | null = null;
+
   constructor() {
     super({ key: "PauseMenuScene" });
   }
@@ -14,6 +17,10 @@ export class PauseMenuScene extends Phaser.Scene {
     this.load.audio("button_click", "assets/audio/ui/button-click.wav");
     this.load.audio("button_hover", "assets/audio/ui/button-hover.wav");
     preloadForestBackground(this);
+  }
+
+  init(data: any) {
+    this.previousSceneKey = data.previousSceneKey || null;
   }
 
   create() {
@@ -40,7 +47,9 @@ export class PauseMenuScene extends Phaser.Scene {
       text: "Resume Game",
       onClick: () => {
         this.scene.stop();
-        this.scene.resume("MainScene");
+        if (this.previousSceneKey) {
+          this.scene.resume(this.previousSceneKey);
+        }
       },
     });
 
@@ -63,9 +72,24 @@ export class PauseMenuScene extends Phaser.Scene {
       y: 475,
       text: "Quit Game",
       onClick: () => {
-        this.scene.stop();
-        this.scene.stop("MainScene");
-        this.scene.start("StartMenuScene");
+        const gameAudio = getGameAudio(this);
+
+        if (this.previousSceneKey) {
+          this.scene.stop(this.previousSceneKey);
+
+          if (this.previousSceneKey === "MainScene") {
+            gameAudio.stopMusic("forest_ambience");
+          } else if (this.previousSceneKey === "BossScene") {
+            gameAudio.stopMusic("cave_ambience");
+          }
+        }
+
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+
+        this.time.delayedCall(500, () => {
+          this.scene.stop();
+          this.scene.start("StartMenuScene");
+        });
       },
     });
   }

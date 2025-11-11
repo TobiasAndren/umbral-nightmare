@@ -17,14 +17,8 @@ export function performSummon(boss: UndeadExecutioner) {
   boss.moveToAndWait(target.x, target.y, 250, () => {
     boss.play("boss_summon", true);
 
-    const summonSound = boss.sounds?.boss_summon_audio as
-      | Phaser.Sound.WebAudioSound
-      | undefined;
-    if (summonSound && !summonSound.isPlaying) {
-      summonSound.loop = true;
-      summonSound.volume = 0.8;
-      summonSound.play();
-    }
+    const summonSoundKey = "boss_summon_audio";
+    const summonSound = boss.audio?.playSFX(summonSoundKey, true);
 
     const summonInterval = boss.scene.time.addEvent({
       delay: 6000,

@@ -1,3 +1,4 @@
+import type { GameAudio } from "../helpers/gameAudio/GameAudio";
 import Enemy from "./Enemy";
 import Phaser from "phaser";
 
@@ -10,16 +11,11 @@ export default class ShadowEnemy extends Enemy {
   deathAnimKey = "shadow_death";
   hurtAnimKey = "shadow_hurt";
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    enemySounds?: Record<string, Phaser.Sound.BaseSound>
-  ) {
+  constructor(scene: Phaser.Scene, x: number, y: number, audio?: GameAudio) {
     super(scene, x, y, "shadow_idle");
     this.speed = 50;
 
-    this.sounds = enemySounds;
+    this.audio = audio;
 
     this.attackHitbox = scene.add.rectangle(
       this.x,
@@ -58,8 +54,9 @@ export default class ShadowEnemy extends Enemy {
   }
 
   update() {
-    if (this.body!.velocity.x === 0 && this.isWalkingSoundPlaying) {
-      this.sounds?.enemy_run_audio?.stop();
+    const onGround = this.body!.blocked.down;
+    if (this.body!.velocity.x === 0 && this.isWalkingSoundPlaying && onGround) {
+      this.audio?.stopSFX("enemy_run_audio");
       this.isWalkingSoundPlaying = false;
     }
     if (this.isDead) return;
@@ -79,7 +76,7 @@ export default class ShadowEnemy extends Enemy {
       if (!this.isAttacking) {
         this.isAttacking = true;
 
-        this.sounds?.enemy_attack_audio?.play({ volume: 0.6 });
+        this.audio?.playSFX("enemy_attack_audio");
         this.play("shadow_attack1");
 
         const onFrameUpdate = (
@@ -123,7 +120,7 @@ export default class ShadowEnemy extends Enemy {
       }
 
       if (!this.isWalkingSoundPlaying) {
-        this.sounds?.enemy_run_audio?.play({ loop: true, volume: 0.2 });
+        this.audio?.playSFX("enemy_run_audio", true);
         this.isWalkingSoundPlaying = true;
       }
 

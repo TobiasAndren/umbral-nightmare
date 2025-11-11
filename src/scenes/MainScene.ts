@@ -17,6 +17,8 @@ import { setupPlayerHealth } from "../player/playerHealth";
 import { createTreeBranch } from "../environment/createTreeBranch";
 import { preloadPlayerAudio } from "../helpers/audioLoaders/preloadPlayerAudio";
 import { preloadEnemyAudio } from "../helpers/audioLoaders/preloadEnemyAudio";
+import { GameAudio } from "../helpers/gameAudio/GameAudio";
+import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
 
 export default class MainScene extends Phaser.Scene {
   private backgroundLayers?: {
@@ -26,9 +28,7 @@ export default class MainScene extends Phaser.Scene {
     close: Phaser.GameObjects.TileSprite;
   };
 
-  private ambience?: Phaser.Sound.BaseSound;
-  private playerSounds!: Record<string, Phaser.Sound.BaseSound>;
-  private enemySounds!: Record<string, Phaser.Sound.BaseSound>;
+  private audio?: GameAudio;
 
   private player!: Phaser.Physics.Arcade.Sprite;
   private enemies!: Phaser.Physics.Arcade.Group;
@@ -59,18 +59,20 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
-    this.ambience = this.sound.add("forest_ambience", {
-      loop: true,
-      volume: 0,
-    });
+    this.cameras.main.fadeIn(1200, 0, 0, 0);
+    this.audio = getGameAudio(this);
 
-    this.ambience.play();
+    this.audio.setMusicVolume(this.audio.musicVolume);
+    this.audio.setSFXVolume(this.audio.sfxVolume);
+
+    const music = this.audio.playMusic("forest_ambience");
+
+    (music as Phaser.Sound.WebAudioSound).setVolume(0);
 
     this.tweens.add({
-      targets: this.ambience,
-      volume: 0.05,
-      duration: 1000,
-      ease: "Sine.easeIn",
+      targets: music,
+      volume: this.audio.musicVolume,
+      duration: 5000,
     });
 
     this.backgroundLayers = createForestBackground(this, true);
@@ -174,18 +176,6 @@ export default class MainScene extends Phaser.Scene {
     this.player.body?.setSize(15, 15);
     this.player.setDepth(1);
 
-    this.playerSounds = {
-      player_run_audio: this.sound.add("player_run_audio"),
-      player_attack_audio: this.sound.add("player_attack_audio"),
-      player_hurt_audio: this.sound.add("player_hurt_audio"),
-    };
-
-    this.enemySounds = {
-      enemy_run_audio: this.sound.add("enemy_run_audio"),
-      enemy_attack_audio: this.sound.add("enemy_attack_audio"),
-      enemy_hurt_audio: this.sound.add("enemy_hurt_audio"),
-    };
-
     this.player.setTint(0xffffff);
 
     this.enemies = this.physics.add.group({
@@ -203,7 +193,7 @@ export default class MainScene extends Phaser.Scene {
     ];
 
     enemyPositions.forEach((pos) => {
-      const enemy = new ShadowEnemy(this, pos.x, pos.y, this.enemySounds);
+      const enemy = new ShadowEnemy(this, pos.x, pos.y, this.audio);
       enemy.setPlayer(this.player);
       enemy.body?.setSize(15, 20);
       enemy.body?.setOffset(25, 20);
@@ -224,16 +214,8 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, 1, 1, -50, 0);
     this.cameras.main.setDeadzone(0, 100);
 
-    setupPlayerHealth(
-      this.player,
-      this,
-      5,
-      410,
-      195,
-      this.ambience,
-      this.playerSounds
-    );
-    setupPlayerControls(this.player, this, this.enemies, this.playerSounds);
+    setupPlayerHealth(this.player, this, 5, 410, 195, this.audio);
+    setupPlayerControls(this.player, this, this.enemies, this.audio);
 
     this.player.play("idle");
 
@@ -262,35 +244,16 @@ export default class MainScene extends Phaser.Scene {
     this.player.setVelocity(0, 0);
     this.player.body!.enable = false;
 
-    if (this.playerSounds) {
-      for (const key in this.playerSounds) {
-        const sound = this.playerSounds[key];
-        if (sound?.isPlaying) {
-          sound.stop();
-        }
-      }
-    }
+    const music = this.audio?.playMusic("forest_ambience");
 
-    if (this.enemySounds) {
-      for (const key in this.enemySounds) {
-        const sound = this.enemySounds[key];
-        if (sound?.isPlaying) {
-          sound.stop();
-        }
-      }
-    }
-
-    if (this.ambience) {
-      this.tweens.add({
-        targets: this.ambience,
-        volume: 0,
-        duration: 1000,
-        ease: "Sine.easeOut",
-        onComplete: () => {
-          this.ambience?.stop();
-        },
-      });
-    }
+    this.tweens.add({
+      targets: music,
+      volume: 0,
+      duration: 1000,
+      onComplete: () => {
+        music?.stop();
+      },
+    });
 
     this.tweens.add({
       targets: this.player,

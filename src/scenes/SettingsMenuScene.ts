@@ -44,7 +44,10 @@ export class SettingsMenuScene extends Phaser.Scene {
       x: width / 2,
       y: 325,
       text: "Sound",
-      onClick: () => {},
+      onClick: () => {
+        this.scene.pause();
+        this.scene.launch("SoundSettingsScene");
+      },
     });
 
     new UIButton({

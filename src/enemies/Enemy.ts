@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import type { GameAudio } from "../helpers/gameAudio/GameAudio";
 
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected player?: Phaser.Physics.Arcade.Sprite;
@@ -9,7 +10,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected deathAnimKey?: string;
   protected hurtAnimKey?: string;
 
-  protected sounds?: Record<string, Phaser.Sound.BaseSound>;
+  protected audio?: GameAudio;
 
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
     super(scene, x, y, texture);
@@ -29,7 +30,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.isHurt = true;
 
-    this.sounds?.enemy_hurt_audio?.play({ volume: 0.2 });
+    this.audio?.playSFX("enemy_hurt_audio");
 
     this.setTintFill(0x880200);
 
