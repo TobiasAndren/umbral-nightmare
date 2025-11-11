@@ -18,7 +18,7 @@ import { createTreeBranch } from "../environment/createTreeBranch";
 import { preloadPlayerAudio } from "../helpers/audioLoaders/preloadPlayerAudio";
 import { preloadEnemyAudio } from "../helpers/audioLoaders/preloadEnemyAudio";
 import { GameAudio } from "../helpers/gameAudio/GameAudio";
-import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
+import { GameState } from "../helpers/gameState";
 
 export default class MainScene extends Phaser.Scene {
   private backgroundLayers?: {
@@ -27,6 +27,12 @@ export default class MainScene extends Phaser.Scene {
     mid: Phaser.GameObjects.TileSprite;
     close: Phaser.GameObjects.TileSprite;
   };
+
+  private checkpoints: { x: number; y: number }[] = [
+    { x: 100, y: 150 },
+    { x: 2400, y: 400 },
+    { x: 4700, y: 200 },
+  ];
 
   private audio?: GameAudio;
 
@@ -58,21 +64,20 @@ export default class MainScene extends Phaser.Scene {
     preloadPlayerHealth(this);
   }
 
-  create() {
+  create(data?: { checkpointIndex: number }) {
+    const spawnIndex =
+      data?.checkpointIndex ?? GameState.lastCheckpointIndex ?? 0;
+
+    const spawnPoint = this.checkpoints[spawnIndex];
+
     this.cameras.main.fadeIn(1200, 0, 0, 0);
-    this.audio = getGameAudio(this);
+    this.audio = new GameAudio(this);
 
     this.audio.setMusicVolume(this.audio.musicVolume);
     this.audio.setSFXVolume(this.audio.sfxVolume);
 
-    const music = this.audio.playMusic("forest_ambience");
-
-    (music as Phaser.Sound.WebAudioSound).setVolume(0);
-
-    this.tweens.add({
-      targets: music,
-      volume: this.audio.musicVolume,
-      duration: 5000,
+    this.time.delayedCall(800, () => {
+      this.audio?.fadeInMusic("forest_ambience", 5000);
     });
 
     this.backgroundLayers = createForestBackground(this, true);
@@ -172,7 +177,11 @@ export default class MainScene extends Phaser.Scene {
     createPlayerAnimations(this);
     createShadowEnemyAnimations(this);
 
-    this.player = this.physics.add.sprite(100, 150, "player_idle");
+    this.player = this.physics.add.sprite(
+      spawnPoint.x,
+      spawnPoint.y,
+      "player_idle"
+    );
     this.player.body?.setSize(15, 15);
     this.player.setDepth(1);
 
@@ -219,8 +228,25 @@ export default class MainScene extends Phaser.Scene {
 
     this.player.play("idle");
 
+    this.checkpoints.forEach((point, index) => {
+      const checkpointZone = this.add.zone(point.x, point.y, 50, 50);
+      this.physics.add.existing(checkpointZone);
+      (checkpointZone.body as Phaser.Physics.Arcade.Body).setAllowGravity(
+        false
+      );
+      (checkpointZone.body as Phaser.Physics.Arcade.Body).setImmovable(true);
+
+      this.physics.add.overlap(this.player, checkpointZone, () => {
+        GameState.lastCheckpointIndex = index;
+      });
+    });
+
     this.physics.add.overlap(this.player, this.levelEnd, () => {
       this.startTransition();
+    });
+
+    this.events.once("shutdown", () => {
+      this.audio?.stopAllAudio();
     });
   }
 
@@ -266,6 +292,7 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.fadeOut(1200, 0, 0, 0);
 
     this.cameras.main.once("camerafadeoutcomplete", () => {
+      this.transitioning = false;
       this.scene.start("BossScene");
     });
   }

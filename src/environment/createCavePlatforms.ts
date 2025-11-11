@@ -8,7 +8,7 @@ export function createCavePlatforms(
 
   for (const pos of platformPositions) {
     const platform = platforms.create(pos.x, pos.y, "cave_platform_tile");
-    platform.setScale(0.5);
+    platform.setScale(0.7);
     platform.refreshBody();
   }
 

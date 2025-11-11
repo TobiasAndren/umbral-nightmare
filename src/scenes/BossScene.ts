@@ -58,6 +58,9 @@ export default class BossScene extends Phaser.Scene {
   create() {
     this.audio = getGameAudio(this);
 
+    this.bossIntroComplete = false;
+    this.hasLanded = false;
+
     this.audio.setMusicVolume(this.audio.musicVolume);
     this.audio.setSFXVolume(this.audio.sfxVolume);
 

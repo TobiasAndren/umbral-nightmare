@@ -6,6 +6,7 @@ import {
 import { UIButton } from "../ui/UIButton";
 import type { GameAudio } from "../helpers/gameAudio/GameAudio";
 import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
+import { GameState } from "../helpers/gameState";
 
 export class DeathMenuScene extends Phaser.Scene {
   private audio?: GameAudio;
@@ -43,7 +44,12 @@ export class DeathMenuScene extends Phaser.Scene {
       x: this.scale.width / 2,
       y: 325,
       text: "Restart",
-      onClick: () => this.handleSceneChange("MainScene"),
+      onClick: () => {
+        this.audio?.stopMusic("menu_ambience");
+        this.scene.start("MainScene", {
+          checkpointIndex: GameState.lastCheckpointIndex,
+        });
+      },
     });
 
     new UIButton({
@@ -51,12 +57,10 @@ export class DeathMenuScene extends Phaser.Scene {
       x: this.scale.width / 2,
       y: 400,
       text: "Main Menu",
-      onClick: () => this.handleSceneChange("StartMenuScene"),
+      onClick: () => {
+        this.audio?.stopMusic("menu_ambience");
+        this.scene.start("StartMenuScene");
+      },
     });
-  }
-
-  private handleSceneChange(nextSceneKey: string) {
-    this.audio?.stopMusic("menu_ambience");
-    this.scene.start(nextSceneKey);
   }
 }

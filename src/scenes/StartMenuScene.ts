@@ -28,15 +28,7 @@ export class StartMenuScene extends Phaser.Scene {
 
     this.audio.setMusicVolume(this.audio.musicVolume);
 
-    const music = this.audio.playMusic("menu_ambience");
-
-    (music as Phaser.Sound.WebAudioSound).setVolume(0);
-
-    this.tweens.add({
-      targets: music,
-      volume: this.audio.musicVolume,
-      duration: 5000,
-    });
+    this.audio.fadeInMusic("menu_ambience", 5000);
 
     const title = this.add.text(this.scale.width / 2, 200, "Umbral Nightmare", {
       fontSize: "64px",
@@ -65,19 +57,14 @@ export class StartMenuScene extends Phaser.Scene {
         });
       },
     });
+
+    this.events.once("shutdown", () => {
+      this.audio?.stopAllAudio();
+    });
   }
 
   private handleSceneChange(nextSceneKey: string) {
-    const music = this.audio?.playMusic("menu_ambience");
-
-    this.tweens.add({
-      targets: music,
-      volume: 0,
-      duration: 1000,
-      onComplete: () => {
-        music?.stop();
-      },
-    });
+    this.audio?.fadeOutMusic("menu_ambience", 1100);
 
     this.cameras.main.fadeOut(1200, 0, 0, 0);
 

@@ -17,10 +17,14 @@ export class GameAudio {
         volume: this.musicVolume,
       });
     }
-    if (!this.bgMusic[key].isPlaying) {
-      this.bgMusic[key].play();
+
+    const music = this.bgMusic[key];
+
+    if (!music.isPlaying) {
+      music.play();
     }
-    return this.bgMusic[key];
+    (music as Phaser.Sound.WebAudioSound).setVolume(this.musicVolume);
+    return music;
   }
 
   stopMusic(key: string) {
@@ -34,6 +38,49 @@ export class GameAudio {
     Object.values(this.bgMusic).forEach((music) =>
       (music as Phaser.Sound.WebAudioSound).setVolume(this.musicVolume)
     );
+  }
+
+  fadeInMusic(key: string, duration: number = 1000, loop: boolean = true) {
+    const music = this.playMusic(key, loop) as Phaser.Sound.WebAudioSound;
+
+    if (this.musicVolume === 0) return;
+
+    if (!music.isPlaying) {
+      music.setVolume(0);
+      music.play();
+    }
+
+    this.scene.tweens.addCounter({
+      from: 0,
+      to: this.musicVolume,
+      duration,
+      onUpdate: (tween) => {
+        music.setVolume(tween.getValue()!);
+      },
+    });
+  }
+
+  fadeOutMusic(
+    key: string,
+    duration: number = 1000,
+    stopAfter: boolean = true
+  ) {
+    const music = this.bgMusic[key] as Phaser.Sound.WebAudioSound;
+    if (!music || !music.isPlaying) return;
+
+    const startVolume = music.volume;
+    this.scene.tweens.addCounter({
+      from: startVolume,
+      to: 0,
+      duration,
+      onUpdate: (tween) => {
+        const value = tween.getValue()!;
+        music.setVolume(value);
+      },
+      onComplete: () => {
+        if (stopAfter) music.stop();
+      },
+    });
   }
 
   playSFX(key: string, loop: boolean = false) {
@@ -62,5 +109,17 @@ export class GameAudio {
     this.sfxSound.forEach((s) => {
       (s as Phaser.Sound.WebAudioSound).setVolume(this.sfxVolume);
     });
+  }
+
+  stopAllAudio() {
+    Object.values(this.bgMusic).forEach((music) => {
+      if (music.isPlaying) music.stop();
+    });
+
+    this.sfxSound.forEach((sfx) => {
+      if (sfx.isPlaying) sfx.stop();
+    });
+
+    this.sfxSound = [];
   }
 }
