@@ -6,7 +6,7 @@ import {
 import { UIButton } from "../ui/UIButton";
 import type { GameAudio } from "../helpers/gameAudio/GameAudio";
 import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
-import { GameState } from "../helpers/gameState";
+import { GameState } from "../helpers/GameState";
 
 export class DeathMenuScene extends Phaser.Scene {
   private audio?: GameAudio;
@@ -43,7 +43,7 @@ export class DeathMenuScene extends Phaser.Scene {
       scene: this,
       x: this.scale.width / 2,
       y: 325,
-      text: "Restart",
+      text: "Try Again",
       onClick: () => {
         this.audio?.stopMusic("menu_ambience");
         this.scene.start("MainScene", {

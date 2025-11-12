@@ -4,7 +4,7 @@ import {
   preloadForestBackground,
 } from "../helpers/backgroundLoaders/preloadForestBackground";
 import { UIButton } from "../ui/UIButton";
-import { GameState } from "../helpers/gameState";
+import { GameState } from "../helpers/GameState";
 import type { GameAudio } from "../helpers/gameAudio/GameAudio";
 import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
 

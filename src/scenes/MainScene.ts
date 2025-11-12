@@ -18,7 +18,9 @@ import { createTreeBranch } from "../environment/createTreeBranch";
 import { preloadPlayerAudio } from "../helpers/audioLoaders/preloadPlayerAudio";
 import { preloadEnemyAudio } from "../helpers/audioLoaders/preloadEnemyAudio";
 import { GameAudio } from "../helpers/gameAudio/GameAudio";
-import { GameState } from "../helpers/gameState";
+import { GameState } from "../helpers/GameState";
+import { preloadCheckpointCrystal } from "../helpers/environmentLoaders/preloadCheckpointCrystal";
+import { createCheckpointCrystalAnimations } from "../animations/checkpointCrystalAnimations";
 
 export default class MainScene extends Phaser.Scene {
   private backgroundLayers?: {
@@ -29,7 +31,7 @@ export default class MainScene extends Phaser.Scene {
   };
 
   private checkpoints: { x: number; y: number }[] = [
-    { x: 100, y: 150 },
+    { x: 100, y: 160 },
     { x: 2400, y: 400 },
     { x: 4700, y: 200 },
   ];
@@ -55,6 +57,10 @@ export default class MainScene extends Phaser.Scene {
       "forest_ambience",
       "assets/audio/ambience/forest-ambience.wav"
     );
+    this.load.audio(
+      "checkpoint_activated",
+      "assets/audio/effects/checkpoint-activated.wav"
+    );
     preloadPlayerAudio(this);
     preloadEnemyAudio(this);
     preloadForestBackground(this);
@@ -62,6 +68,7 @@ export default class MainScene extends Phaser.Scene {
     preloadShadowEnemySprites(this);
     preloadForestTiles(this);
     preloadPlayerHealth(this);
+    preloadCheckpointCrystal(this);
   }
 
   create(data?: { checkpointIndex: number }) {
@@ -174,6 +181,7 @@ export default class MainScene extends Phaser.Scene {
       { x: 3300, y: 255 },
     ]);
 
+    createCheckpointCrystalAnimations(this);
     createPlayerAnimations(this);
     createShadowEnemyAnimations(this);
 
@@ -229,6 +237,17 @@ export default class MainScene extends Phaser.Scene {
     this.player.play("idle");
 
     this.checkpoints.forEach((point, index) => {
+      const isActivated = GameState.activatedCheckpoints.has(index);
+
+      const crystal = this.add.sprite(
+        point.x,
+        point.y,
+        isActivated ? "green_crystal" : "red_crystal"
+      );
+      crystal.play(isActivated ? "green_crystal" : "red_crystal");
+      crystal.setDepth(1.5);
+      crystal.setScale(0.5);
+
       const checkpointZone = this.add.zone(point.x, point.y, 50, 50);
       this.physics.add.existing(checkpointZone);
       (checkpointZone.body as Phaser.Physics.Arcade.Body).setAllowGravity(
@@ -237,7 +256,14 @@ export default class MainScene extends Phaser.Scene {
       (checkpointZone.body as Phaser.Physics.Arcade.Body).setImmovable(true);
 
       this.physics.add.overlap(this.player, checkpointZone, () => {
+        if (GameState.activatedCheckpoints.has(index)) return;
+
+        GameState.activatedCheckpoints.add(index);
         GameState.lastCheckpointIndex = index;
+
+        this.audio?.playSFX("checkpoint_activated");
+        crystal.setTexture("green_crystal");
+        crystal.play("green_crystal");
       });
     });
 
