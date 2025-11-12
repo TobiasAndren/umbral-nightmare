@@ -6,7 +6,7 @@ import {
 import { UIButton } from "../ui/UIButton";
 import type { GameAudio } from "../helpers/gameAudio/GameAudio";
 import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
-import { GameState } from "../helpers/temp";
+import { GameState } from "../helpers/gameState";
 
 export class DeathMenuScene extends Phaser.Scene {
   private audio?: GameAudio;
