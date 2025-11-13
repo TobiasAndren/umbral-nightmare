@@ -29,7 +29,7 @@ export class WinMenuScene extends Phaser.Scene {
 
     this.audio.setMusicVolume(this.audio.musicVolume);
 
-    this.audio.fadeInMusic("menu_ambience", 5000);
+    this.audio.playMusic("menu_ambience");
 
     const title = this.add.text(this.scale.width / 2, 200, "You Win!", {
       fontSize: "64px",

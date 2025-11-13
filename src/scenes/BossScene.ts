@@ -157,6 +157,7 @@ export default class BossScene extends Phaser.Scene {
         cam.fadeOut(1000, 0, 0, 0);
 
         cam.once("camerafadeoutcomplete", () => {
+          this.audio.stopAllAudio();
           this.scene.start("WinMenuScene");
         });
       });

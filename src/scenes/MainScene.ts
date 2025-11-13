@@ -21,6 +21,7 @@ import { GameAudio } from "../helpers/gameAudio/GameAudio";
 import { GameState } from "../helpers/gameState/GameState";
 import { preloadCheckpointCrystal } from "../helpers/environmentLoaders/preloadCheckpointCrystal";
 import { createCheckpointCrystalAnimations } from "../animations/checkpointCrystalAnimations";
+import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
 
 export default class MainScene extends Phaser.Scene {
   private backgroundLayers?: {
@@ -78,13 +79,13 @@ export default class MainScene extends Phaser.Scene {
     const spawnPoint = this.checkpoints[spawnIndex];
 
     this.cameras.main.fadeIn(1200, 0, 0, 0);
-    this.audio = new GameAudio(this);
+    this.audio = getGameAudio(this);
 
     this.audio.setMusicVolume(this.audio.musicVolume);
     this.audio.setSFXVolume(this.audio.sfxVolume);
 
     this.time.delayedCall(800, () => {
-      this.audio?.fadeInMusic("forest_ambience", 5000);
+      this.audio?.playMusic("forest_ambience");
     });
 
     this.backgroundLayers = createForestBackground(this, true);

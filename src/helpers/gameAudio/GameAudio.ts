@@ -40,26 +40,6 @@ export class GameAudio {
     );
   }
 
-  fadeInMusic(key: string, duration: number = 1000, loop: boolean = true) {
-    const music = this.playMusic(key, loop) as Phaser.Sound.WebAudioSound;
-
-    if (this.musicVolume === 0) return;
-
-    if (!music.isPlaying) {
-      music.setVolume(0);
-      music.play();
-    }
-
-    this.scene.tweens.addCounter({
-      from: 0,
-      to: this.musicVolume,
-      duration,
-      onUpdate: (tween) => {
-        music.setVolume(tween.getValue()!);
-      },
-    });
-  }
-
   fadeOutMusic(
     key: string,
     duration: number = 1000,

@@ -28,7 +28,7 @@ export class StartMenuScene extends Phaser.Scene {
 
     this.audio.setMusicVolume(this.audio.musicVolume);
 
-    this.audio.fadeInMusic("menu_ambience", 5000);
+    this.audio.playMusic("menu_ambience");
 
     const title = this.add.text(this.scale.width / 2, 200, "Umbral Nightmare", {
       fontSize: "64px",
