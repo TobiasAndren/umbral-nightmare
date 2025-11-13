@@ -5,7 +5,7 @@ import {
   preloadForestBackground,
 } from "../helpers/backgroundLoaders/preloadForestBackground";
 import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
-import { GameState } from "../helpers/gameState_temp";
+import { GameState } from "../helpers/gameState/GameState";
 
 export class PauseMenuScene extends Phaser.Scene {
   private previousSceneKey: string | null = null;

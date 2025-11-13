@@ -18,7 +18,7 @@ import { createTreeBranch } from "../environment/createTreeBranch";
 import { preloadPlayerAudio } from "../helpers/audioLoaders/preloadPlayerAudio";
 import { preloadEnemyAudio } from "../helpers/audioLoaders/preloadEnemyAudio";
 import { GameAudio } from "../helpers/gameAudio/GameAudio";
-import { GameState } from "../helpers/gameState_temp";
+import { GameState } from "../helpers/gameState/GameState";
 import { preloadCheckpointCrystal } from "../helpers/environmentLoaders/preloadCheckpointCrystal";
 import { createCheckpointCrystalAnimations } from "../animations/checkpointCrystalAnimations";
 
