@@ -61,6 +61,7 @@ function spawnDemons(boss: UndeadExecutioner) {
     );
 
     scene.add.existing(demon);
+    boss.activeDemons.push(demon);
     scene.physics.add.existing(demon);
 
     demon.body?.setSize(25, 25);

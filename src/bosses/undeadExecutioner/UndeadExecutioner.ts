@@ -5,6 +5,7 @@ import { performMeleeAttack } from "./logic/meleeAttack";
 import { performSkillMove } from "./logic/skillAttack";
 import { performSummon } from "./logic/summonAttack";
 import type { GameAudio } from "../../helpers/gameAudio/GameAudio";
+import type Demon from "./UndeadExecutionerSummon";
 
 export default class UndeadExecutioner extends Boss {
   public attackCooldown = false;
@@ -14,6 +15,7 @@ export default class UndeadExecutioner extends Boss {
   public moveCallback?: () => void;
   public moveHasStarted: boolean = false;
   private lastAttack: string = "";
+  public activeDemons: Demon[] = [];
 
   public meleeHitBox!: Phaser.GameObjects.Rectangle;
   public meleeBody!: Phaser.Physics.Arcade.Body;
@@ -102,5 +104,13 @@ export default class UndeadExecutioner extends Boss {
   protected onDeath() {
     this.clearAttackTimers();
     this.setVelocity(0, 0);
+
+    this.activeDemons.forEach((demon) => {
+      if (!demon.isDead) {
+        demon.destroy();
+      }
+    });
+
+    this.activeDemons = [];
   }
 }
