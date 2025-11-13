@@ -4,7 +4,7 @@ import {
   preloadForestBackground,
 } from "../helpers/backgroundLoaders/preloadForestBackground";
 import { UIButton } from "../ui/UIButton";
-import { GameState } from "../helpers/gameState";
+import { GameState } from "../helpers/gameState_temp";
 import type { GameAudio } from "../helpers/gameAudio/GameAudio";
 import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
 
@@ -62,6 +62,7 @@ export class WinMenuScene extends Phaser.Scene {
       text: "Main Menu",
       onClick: () => {
         GameState.lastCheckpointIndex = 0;
+        GameState.activatedCheckpoints.clear();
         this.cameras.main.fadeOut(1200, 0, 0, 0);
         this.audio?.fadeOutMusic("menu_ambience", 1000);
         this.time.delayedCall(1200, () => {
