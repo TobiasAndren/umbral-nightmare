@@ -12,7 +12,6 @@ import {
 } from "../helpers/backgroundLoaders/preloadForestBackground";
 import { preloadForestTiles } from "../helpers/environmentLoaders/preloadForestTiles";
 import { createForestPlatforms } from "../environment/createForestPlatforms";
-import { preloadPlayerHealth } from "../helpers/uiLoaders/preloadPlayerHealth";
 import { setupPlayerHealth } from "../player/playerHealth";
 import { createTreeBranch } from "../environment/createTreeBranch";
 import { preloadPlayerAudio } from "../helpers/audioLoaders/preloadPlayerAudio";
@@ -22,6 +21,7 @@ import { GameState } from "../helpers/gameState/GameState";
 import { preloadCheckpointCrystal } from "../helpers/environmentLoaders/preloadCheckpointCrystal";
 import { createCheckpointCrystalAnimations } from "../animations/checkpointCrystalAnimations";
 import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
+import { preloadUiHearts } from "../helpers/uiLoaders/preloadUiHearts";
 
 export default class MainScene extends Phaser.Scene {
   private backgroundLayers?: {
@@ -68,7 +68,7 @@ export default class MainScene extends Phaser.Scene {
     preloadPlayerSprites(this);
     preloadShadowEnemySprites(this);
     preloadForestTiles(this);
-    preloadPlayerHealth(this);
+    preloadUiHearts(this);
     preloadCheckpointCrystal(this);
   }
 

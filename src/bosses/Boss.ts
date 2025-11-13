@@ -56,6 +56,8 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
       this.isHurt = false;
     });
 
+    this.emit("takeDamage", amount);
+
     if (this.currentHealth <= 0) {
       this.die();
     }

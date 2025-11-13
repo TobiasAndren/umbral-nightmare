@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import { preloadPlayerHealth } from "../helpers/uiLoaders/preloadPlayerHealth";
 import { preloadPlayerSprites } from "../helpers/spriteLoaders/preloadPlayerAssets";
 import { preloadBossSprites } from "../helpers/spriteLoaders/preloadBossAssets";
 import { setupPlayerControls } from "../player/playerController";
@@ -20,6 +19,8 @@ import { preloadBossAudio } from "../helpers/audioLoaders/preloadBossAudio";
 import { preloadPlayerAudio } from "../helpers/audioLoaders/preloadPlayerAudio";
 import { GameAudio } from "../helpers/gameAudio/GameAudio";
 import { getGameAudio } from "../helpers/gameAudio/gameAudioManager";
+import { preloadUiHearts } from "../helpers/uiLoaders/preloadUiHearts";
+import { setupBossHealth } from "../bosses/setupBossHealth";
 
 export default class BossScene extends Phaser.Scene {
   private audio!: GameAudio;
@@ -49,7 +50,7 @@ export default class BossScene extends Phaser.Scene {
     preloadPlayerAudio(this);
     preloadBossAudio(this);
     preloadCaveBackground(this);
-    preloadPlayerHealth(this);
+    preloadUiHearts(this);
     preloadPlayerSprites(this);
     preloadBossSprites(this);
     preloadCaveTiles(this);
@@ -219,6 +220,8 @@ export default class BossScene extends Phaser.Scene {
     this.boss.setActive(true);
 
     this.player.setData("isInvincible", false);
+
+    setupBossHealth(this.boss, this, 20);
 
     setupPlayerControls(this.player, this, this.enemies, this.audio);
   }
