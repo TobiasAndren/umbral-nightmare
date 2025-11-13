@@ -13,6 +13,8 @@ export function setupPlayerInput(scene: Phaser.Scene) {
     P: Phaser.Input.Keyboard.KeyCodes.P,
   }) as { [key: string]: Phaser.Input.Keyboard.Key };
 
+  let mouseWasDown = false;
+
   return {
     cursors,
     keys,
@@ -30,10 +32,18 @@ export function setupPlayerInput(scene: Phaser.Scene) {
 
     isAttackPressed: () => {
       const preset = getActivePreset();
-      if (preset.attack === "SPACE")
+
+      if (preset.attack === "SPACE") {
         return Phaser.Input.Keyboard.JustDown(keys.SPACE);
-      if (preset.attack === "MOUSE_LEFT_BUTTON")
-        return scene.input.activePointer.isDown;
+      }
+
+      if (preset.attack === "MOUSE_LEFT_BUTTON") {
+        const pointer = scene.input.activePointer;
+        const justDown = pointer.leftButtonDown() && !mouseWasDown;
+        mouseWasDown = pointer.leftButtonDown();
+        return justDown;
+      }
+
       return false;
     },
   };
