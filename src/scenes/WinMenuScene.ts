@@ -47,6 +47,7 @@ export class WinMenuScene extends Phaser.Scene {
       text: "Play Again",
       onClick: () => {
         GameState.lastCheckpointIndex = 0;
+        GameState.activatedCheckpoints.clear();
         this.cameras.main.fadeOut(1200, 0, 0, 0);
         this.audio?.fadeOutMusic("menu_ambience", 1000);
         this.time.delayedCall(1200, () => {
